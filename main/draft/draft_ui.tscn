@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://vyrrnhl6jyxa"]
+
+[ext_resource type="Script" uid="uid://hqn5hkwuipjv" path="res://main/draft/draft_ui.gd" id="1_je1np"]
+[ext_resource type="PackedScene" uid="uid://bbf73agac7dt2" path="res://main/draft/draft_choice.tscn" id="2_6ipgi"]
+
+[node name="DraftUI" type="Control" unique_id=705700989 node_paths=PackedStringArray("choices_container")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_je1np")
+draft_choice_scene = ExtResource("2_6ipgi")
+choices_container = NodePath("CenterContainer/HBoxContainer")
+
+[node name="CenterContainer" type="Container" parent="." unique_id=1567511136]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer" unique_id=1984457320]
+layout_mode = 2

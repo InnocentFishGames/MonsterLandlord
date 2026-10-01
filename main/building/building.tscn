@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cjm4ojk766a8s"]
+
+[ext_resource type="Script" uid="uid://crj8khccc7anw" path="res://main/building/building.gd" id="1_gkkqd"]
+[ext_resource type="Script" uid="uid://cdnx0f12gcrb5" path="res://main/building/grid_component.gd" id="2_k4wsm"]
+[ext_resource type="Script" uid="uid://db8unkrhu6rvv" path="res://main/rooms/room_manager.gd" id="3_7qwv5"]
+[ext_resource type="PackedScene" uid="uid://bwbta0gbx2bfe" path="res://main/rooms/room.tscn" id="4_7qwv5"]
+
+[node name="Building" type="Node2D" unique_id=1826555542 node_paths=PackedStringArray("grid_component", "room_container")]
+script = ExtResource("1_gkkqd")
+grid_component = NodePath("GridComponent")
+room_container = NodePath("RoomManager")
+
+[node name="GridComponent" type="Node2D" parent="." unique_id=2019904884]
+script = ExtResource("2_k4wsm")
+
+[node name="RoomManager" type="Node2D" parent="." unique_id=833183095 node_paths=PackedStringArray("grid_component")]
+script = ExtResource("3_7qwv5")
+grid_component = NodePath("../GridComponent")
+room_scene = ExtResource("4_7qwv5")
