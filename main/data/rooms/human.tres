@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="RoomResource" format=3 uid="uid://uinghsfvbkuu"]
-
-[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/data/room_resource.gd" id="1_7tc4e"]
-
-[resource]
-script = ExtResource("1_7tc4e")
-name = "Human"
-metadata/_custom_type_script = "uid://rhmkawfqhsdc"

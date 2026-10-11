@@ -1,6 +1,11 @@
 [gd_scene format=3 uid="uid://bwbta0gbx2bfe"]
 
 [ext_resource type="Script" uid="uid://vlubmhbwwe47" path="res://main/rooms/room.gd" id="1_byimd"]
+[ext_resource type="Script" uid="uid://b0ktkpbf6oq1x" path="res://main/tenants/tenant_visual.gd" id="2_o24wl"]
 
-[node name="Room" type="Node2D" unique_id=234516273]
+[node name="Room" type="Node2D" unique_id=234516273 node_paths=PackedStringArray("tenant_visual")]
 script = ExtResource("1_byimd")
+tenant_visual = NodePath("TenantVisual")
+
+[node name="TenantVisual" type="Node2D" parent="." unique_id=2115643022]
+script = ExtResource("2_o24wl")

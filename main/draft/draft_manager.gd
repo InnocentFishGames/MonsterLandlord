@@ -5,13 +5,14 @@ extends Node
 # DraftManager does not decide what happens to the selected room next.
 # A higher-level system can listen for this signal and decide what to do.
 signal room_selected(room_resource: RoomResource)
+signal room_drag_started(room_resource: RoomResource)
+signal room_drag_released
 
 # The RoomResources that are currently allowed to appear in a draft.
 @export var available_rooms: Array[RoomResource] = []
 @export var draft_ui: DraftUI
 
 const DRAFT_CHOICE_COUNT: int = 3
-
 
 func _ready() -> void:
 	if draft_ui == null:
@@ -27,10 +28,39 @@ func _ready() -> void:
 			% DRAFT_CHOICE_COUNT
 		)
 		return
+	for room_resource: RoomResource in available_rooms:
+		if room_resource == null:
+			push_error(
+				"DraftManager: Available Rooms contains an empty RoomResource slot."
+			)
+			return
 	draft_ui.room_selected.connect(
 	_on_room_selected
 	)
+	draft_ui.room_drag_started.connect(
+		_on_room_drag_started
+	)
 	create_draft()
+	
+	draft_ui.room_drag_released.connect(
+	_on_room_drag_released
+)
+	
+func _on_room_drag_released() -> void:
+	room_drag_released.emit()
+	
+func _on_room_drag_started(
+	room_resource: RoomResource
+) -> void:
+	if room_resource == null:
+		push_error(
+			"DraftManager: DraftUI returned a null RoomResource when drag started."
+		)
+		return
+
+	room_drag_started.emit(room_resource)
+	
+	
 func _on_room_selected(room_resource: RoomResource) -> void:
 	if room_resource == null:
 		push_error(
@@ -38,7 +68,9 @@ func _on_room_selected(room_resource: RoomResource) -> void:
 		)
 		return
 
+	print("Selected RoomResource: ", room_resource.room_name)
 	room_selected.emit(room_resource)
+	
 func create_draft() -> void:
 	if draft_ui == null:
 		push_error(

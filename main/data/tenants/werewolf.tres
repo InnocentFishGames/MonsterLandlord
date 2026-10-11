@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://khv8ya4f3e3v"]
+
+[ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_l2t0h"]
+
+[resource]
+script = ExtResource("1_l2t0h")
+tenant_name = "Werewolf"
+metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

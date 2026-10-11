@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RoomResource" format=3 uid="uid://d0gvhgosyau4s"]
+
+[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="1_5wef2"]
+
+[resource]
+script = ExtResource("1_5wef2")
+room_name = "Premium Room"
+size = Vector2i(3, 1)
+metadata/_custom_type_script = "uid://rhmkawfqhsdc"

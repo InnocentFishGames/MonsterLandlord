@@ -3,28 +3,34 @@
 [ext_resource type="Script" uid="uid://bpcx8n4lvu4fj" path="res://main/draft/draft_choice.gd" id="1_qobnv"]
 
 [node name="DraftChoice" type="Button" unique_id=1337244680 node_paths=PackedStringArray("name_label", "rarity_label", "size_label")]
+custom_minimum_size = Vector2(180, 220)
 offset_left = 297.0
 offset_top = 146.0
 offset_right = 497.0
 offset_bottom = 346.0
 script = ExtResource("1_qobnv")
-name_label = NodePath("MarginContainer/Name")
-rarity_label = NodePath("MarginContainer/Rarity")
-size_label = NodePath("MarginContainer/Size")
+name_label = NodePath("MarginContainer/VBoxContainer/Name")
+rarity_label = NodePath("MarginContainer/VBoxContainer/Rarity")
+size_label = NodePath("MarginContainer/VBoxContainer/Size")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1590693854]
+custom_minimum_size = Vector2(180, 220)
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 11.0
+offset_top = 1.0
+offset_right = 191.0
+offset_bottom = 221.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1551697620]
 layout_mode = 2
+alignment = 1
 
-[node name="Name" type="Label" parent="MarginContainer" unique_id=931025740]
+[node name="Name" type="Label" parent="MarginContainer/VBoxContainer" unique_id=931025740]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Rarity" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1316342397]
 layout_mode = 2
 
-[node name="Rarity" type="Label" parent="MarginContainer" unique_id=1316342397]
-layout_mode = 2
-
-[node name="Size" type="Label" parent="MarginContainer" unique_id=1543549143]
+[node name="Size" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1543549143]
 layout_mode = 2

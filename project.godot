@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Monster Landlord V2"
-run/main_scene="uid://cjm4ojk766a8s"
+run/main_scene="uid://j1v3ghx0ipnu"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 

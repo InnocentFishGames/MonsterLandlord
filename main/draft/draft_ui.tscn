@@ -6,6 +6,10 @@
 [node name="DraftUI" type="Control" unique_id=705700989 node_paths=PackedStringArray("choices_container")]
 layout_mode = 3
 anchors_preset = 0
+offset_left = 754.0
+offset_top = 175.0
+offset_right = 754.0
+offset_bottom = 175.0
 script = ExtResource("1_je1np")
 draft_choice_scene = ExtResource("2_6ipgi")
 choices_container = NodePath("CenterContainer/HBoxContainer")

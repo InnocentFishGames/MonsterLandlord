@@ -2,14 +2,12 @@
 
 [ext_resource type="PackedScene" uid="uid://vyrrnhl6jyxa" path="res://main/draft/draft_ui.tscn" id="1_86ovo"]
 [ext_resource type="Script" uid="uid://cc4kjnyka6457" path="res://main/draft/draft_manager.gd" id="1_xel72"]
-[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/data/room_resource.gd" id="2_lxaur"]
-[ext_resource type="Resource" uid="uid://uinghsfvbkuu" path="res://main/data/rooms/human.tres" id="3_lxaur"]
-[ext_resource type="Resource" uid="uid://dpe0twol7wiov" path="res://main/data/rooms/vampire.tres" id="4_xoc4u"]
-[ext_resource type="Resource" uid="uid://b1ibytnprq17p" path="res://main/data/rooms/Werewolf.tres" id="5_tupwp"]
+[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="2_lxaur"]
+
 
 [node name="DraftManager" type="Node" unique_id=1332573867 node_paths=PackedStringArray("draft_ui")]
 script = ExtResource("1_xel72")
-available_rooms = Array[ExtResource("2_lxaur")]([ExtResource("3_lxaur"), ExtResource("4_xoc4u"), ExtResource("5_tupwp")])
+available_rooms = Array[ExtResource("2_lxaur")]([])
 draft_ui = NodePath("DraftUI")
 
 [node name="DraftUI" parent="." unique_id=705700989 instance=ExtResource("1_86ovo")]

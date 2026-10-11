@@ -64,48 +64,7 @@ func can_fit_room(
 
 	return true
 	
-func is_room_position_available(
-	room_instance: RoomInstance,
-	rooms: Array[RoomInstance]
-) -> bool:
-	if room_instance == null:
-		return false
 
-	var room_position: Vector2i = room_instance.grid_position
-	var room_size: Vector2i = room_instance.room_resource.size
-
-	# Check every cell that the new room would occupy.
-	for y: int in range(room_size.y):
-		for x: int in range(room_size.x):
-			var grid_position: Vector2i = room_position + Vector2i(x, y)
-
-			# Check this cell against every room that is
-			# already inside the building.
-			for existing_room: RoomInstance in rooms:
-				# Get the position of the existing room.
-				var existing_position: Vector2i = existing_room.grid_position
-
-				# Get the size of the existing room.
-				var existing_size: Vector2i = existing_room.room_resource.size
-
-				# Calculate the grid position immediately after
-				# the existing room's occupied area.
-				var existing_end: Vector2i = existing_position + existing_size
-
-				# Determine whether the cell we're checking
-				# falls inside the existing room.
-				var is_occupied: bool = (
-					grid_position.x >= existing_position.x
-					and grid_position.x < existing_end.x
-					and grid_position.y >= existing_position.y
-					and grid_position.y < existing_end.y
-				)
-				# If even one cell is occupied, the new room
-				# cannot be placed here.
-				if is_occupied:
-					return false
-	return true
-	
 func get_building_size() -> Vector2:
 	# Return the total pixel size of the building.
 	# So our 3x3 building is 768x768 pixels.

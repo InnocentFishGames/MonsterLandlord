@@ -1,23 +1,44 @@
 class_name Room
 extends Node2D
 
-# The logical room data that this visual Room represents.
-var room_instance: RoomInstance
 
+var room_instance: RoomInstance = null
+@export var tenant_visual: Node2D
 
-func setup(instance: RoomInstance) -> void:
-	# Make sure we were given a valid RoomInstance.
-	if instance == null:
-		push_error("Room: Cannot setup with a null RoomInstance.")
+func setup(new_room_instance: RoomInstance) -> void:
+	if new_room_instance == null:
+		push_error(
+			"Room: Cannot setup room because RoomInstance is null."
+		)
 		return
 
-	# Store the logical room this visual object represents.
-	room_instance = instance
+	if new_room_instance.room_resource == null:
+		push_error(
+			"Room: Cannot setup room because RoomResource is null."
+		)
+		return
+	if tenant_visual == null:
+		push_error(
+			"Room: Cannot setup because TenantVisual is not assigned."
+		)
+		return
+		
+	room_instance = new_room_instance
+	_update_tenant_visual()
 
-	# Redraw the Room now that we know its size.
 	queue_redraw()
 
+func _update_tenant_visual() -> void:
+	if room_instance == null:
+		tenant_visual.hide()
+		return
 
+	if room_instance.is_occupied():
+		tenant_visual.show()
+	else:
+		tenant_visual.hide()
+		
+		
 func _draw() -> void:
 	# We cannot draw anything until the Room has been given
 	# a RoomInstance.

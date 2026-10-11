@@ -3,7 +3,6 @@ class_name RoomManager extends Node2D
 # The grid this RoomManager is working with.
 @export var grid_component: GridComponent
 @export var room_scene: PackedScene
-
 # All rooms currently belonging to this building.
 # RoomManager owns this collection because managing rooms
 # is its responsibility.
@@ -34,21 +33,15 @@ func add_room(room_instance: RoomInstance) -> bool:
 		return false
 
 	# First, check whether the entire room fits inside the building.
-	if not grid_component.can_fit_room(
-		room_instance.grid_position,
-		room_instance.room_resource.size
+	if not can_place_room(
+		room_instance.room_resource,
+		room_instance.grid_position
 	):
-		push_error("RoomManager: Room does not fit inside the building grid.")
+		push_error("RoomManager: Room overlaps an existing room.")
 		return false
 
 	# Next, check whether another room already occupies
 	# any of the cells this room wants to use.
-	if not grid_component.is_room_position_available(
-		room_instance,
-		rooms
-	):
-		push_error("RoomManager: Room overlaps an existing room.")
-		return false
 	
 	# Create the visual Room scene.
 	var room_node: Node = room_scene.instantiate()
@@ -78,3 +71,50 @@ func add_room(room_instance: RoomInstance) -> bool:
 	add_child(room)
 
 	return true
+
+func can_place_room(
+	room_resource: RoomResource,
+	grid_position: Vector2i
+) -> bool:
+	if room_resource == null:
+		push_error(
+			"RoomManager: Cannot check placement with a null RoomResource."
+		)
+		return false
+
+	# Check every cell that the new room would occupy.
+	for x: int in range(room_resource.size.x):
+		for y: int in range(room_resource.size.y):
+			var cell_position: Vector2i = (
+				grid_position + Vector2i(x, y)
+			)
+
+			if is_grid_position_occupied(cell_position):
+				return false
+
+	return true
+
+func is_grid_position_occupied(
+	grid_position: Vector2i
+) -> bool:
+	for room_instance: RoomInstance in rooms:
+		if room_instance == null:
+			push_warning(
+				"RoomManager: Rooms contains a null RoomInstance."
+			)
+			continue
+
+		var room_start: Vector2i = room_instance.grid_position
+		var room_end: Vector2i = (
+			room_start + room_instance.room_resource.size
+		)
+
+		if (
+			grid_position.x >= room_start.x
+			and grid_position.x < room_end.x
+			and grid_position.y >= room_start.y
+			and grid_position.y < room_end.y
+		):
+			return true
+
+	return false
