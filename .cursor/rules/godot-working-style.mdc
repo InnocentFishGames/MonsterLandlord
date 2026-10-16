@@ -1,0 +1,15 @@
+---
+description: How to change this Godot project—read local files first, small steps, honest testing.
+alwaysApply: true
+---
+
+# Working style
+
+- Godot 4.7, 2D, GDScript only.
+- The current local project is the source of truth. Read the relevant `.gd` and `.tscn` files before changing them. Do not invent from chat summaries or old ZIPs.
+- Change one understandable slice at a time. No unrelated refactors or speculative features.
+- After edits, say what changed, why, and how Hugo can test it in the editor.
+- Code inspection is not a Godot run. Never claim a runtime test that was not performed.
+- Assume a beginner reader. Comment *why*, not the next line of code.
+- Edit files in place with small diffs. When showing a snippet in chat for Hugo to paste, give a complete replacement function and name its file.
+---

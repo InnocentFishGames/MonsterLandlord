@@ -2,24 +2,27 @@
 
 [ext_resource type="PackedScene" uid="uid://cjm4ojk766a8s" path="res://main/building/building.tscn" id="1_3ni26"]
 [ext_resource type="Script" uid="uid://wjmcmv7th0rp" path="res://main/game/game.gd" id="1_gpuo4"]
+[ext_resource type="Resource" uid="uid://cn56hrbav7fqx" path="res://main/data/rooms/luxury_room.tres" id="2_ej72j"]
 [ext_resource type="PackedScene" uid="uid://uxjrul0r07a1" path="res://main/draft/draft_manager.tscn" id="2_gpuo4"]
 [ext_resource type="Script" uid="uid://bf2yegl5hmhlu" path="res://main/placement/placement_controller.gd" id="3_458dk"]
-[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="4_u7x3r"]
-[ext_resource type="Resource" uid="uid://dpx5s2doeeesr" path="res://main/data/rooms/basic_room.tres" id="5_6lqia"]
-[ext_resource type="Resource" uid="uid://d0svf7cm22vjv" path="res://main/data/rooms/medium_room.tres" id="6_u71ym"]
 [ext_resource type="Script" uid="uid://b723qvf7mii3x" path="res://main/placement/placement_preview.gd" id="6_ux4xf"]
-[ext_resource type="Resource" uid="uid://d0gvhgosyau4s" path="res://main/data/rooms/premium_room.tres" id="7_yo04u"]
+[ext_resource type="Script" uid="uid://ckqfaqu5f84q3" path="res://main/resolution/resolution_manager.gd" id="7_ej72j"]
+[ext_resource type="PackedScene" uid="uid://dndn3mdbydo3x" path="res://main/ui/hud/hud.tscn" id="8_en41u"]
+[ext_resource type="Script" uid="uid://cv3q0dy48l0wy" path="res://main/month/month_manager.gd" id="8_u7x3r"]
 
-[node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "placement_controller", "draft_manager")]
+[node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "placement_controller", "draft_manager", "resolution_manager", "hud", "month_manager")]
 script = ExtResource("1_gpuo4")
 building = NodePath("Building")
 placement_controller = NodePath("PlacementController")
 draft_manager = NodePath("DraftManager")
+resolution_manager = NodePath("ResolutionManager")
+hud = NodePath("Hud")
+month_manager = NodePath("MonthManager")
+starting_room_resource = ExtResource("2_ej72j")
 
 [node name="Building" parent="." unique_id=1826555542 instance=ExtResource("1_3ni26")]
 
 [node name="DraftManager" parent="." unique_id=1332573867 instance=ExtResource("2_gpuo4")]
-available_rooms = Array[ExtResource("4_u7x3r")]([ExtResource("5_6lqia"), ExtResource("6_u71ym"), ExtResource("7_yo04u")])
 
 [node name="PlacementController" type="Node2D" parent="." unique_id=579467177 node_paths=PackedStringArray("placement_preview", "placement_controls", "confirm_button", "cancel_button")]
 script = ExtResource("3_458dk")
@@ -45,3 +48,11 @@ text = "Confirm"
 [node name="CancelButton" type="Button" parent="PlacementController/PlacementControl" unique_id=1704687245]
 layout_mode = 2
 text = "Cancel"
+
+[node name="ResolutionManager" type="Node" parent="." unique_id=349156048]
+script = ExtResource("7_ej72j")
+
+[node name="MonthManager" type="Node" parent="." unique_id=635605168]
+script = ExtResource("8_u7x3r")
+
+[node name="Hud" parent="." unique_id=1913822774 instance=ExtResource("8_en41u")]

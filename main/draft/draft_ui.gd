@@ -1,10 +1,10 @@
 class_name DraftUI
 extends Control
 
+
 # Emitted upward when one of our DraftChoice children is selected.
-signal room_selected(room_resource: RoomResource)
-signal room_drag_started(room_resource: RoomResource)
-signal room_drag_released
+signal tenant_drag_released()
+
 
 # Scene used to create individual draft choices.
 @export var draft_choice_scene: PackedScene
@@ -12,93 +12,63 @@ signal room_drag_released
 # Container that owns the generated DraftChoice nodes.
 @export var choices_container: HBoxContainer
 
-func _ready() -> void:
+
+func initialize() -> bool:
+	# Validate the Inspector dependencies owned by this UI.
 	if draft_choice_scene == null:
 		push_error(
 			"DraftUI: DraftChoice scene has not been assigned."
 		)
-		return
+		return false
 
 	if choices_container == null:
 		push_error(
 			"DraftUI: ChoicesContainer has not been assigned."
 		)
-		return
+		return false
 
-func show_draft(room_resources: Array[RoomResource]) -> void:
+	return true
 
-	if room_resources.is_empty():
-		push_warning(
-			"DraftUI: Cannot display an empty draft."
-		)
-		return
 
+func show_draft(
+	tenant_resources: Array[TenantResource]
+) -> bool:
 	clear_draft()
 
-	for room_resource: RoomResource in room_resources:
-		if room_resource == null:
-			push_warning(
-				"DraftUI: Draft contained a null RoomResource. Skipping it."
-			)
-			continue
-
+	for tenant_resource: TenantResource in tenant_resources:
 		var choice_node: Node = draft_choice_scene.instantiate()
 
-		if not choice_node is DraftChoice:
+		# The Inspector can contain a scene with the wrong root type.
+		if choice_node is not DraftChoice:
 			push_error(
 				"DraftUI: DraftChoice scene root must be a DraftChoice."
 			)
-
 			choice_node.queue_free()
-			continue
+			clear_draft()
+			return false
 
 		var draft_choice: DraftChoice = choice_node as DraftChoice
 
-		choices_container.add_child(draft_choice)
+		# Configure before adding the button to the active interface.
+		if not draft_choice.setup(tenant_resource):
+			draft_choice.queue_free()
+			clear_draft()
+			return false
 
-		draft_choice.setup(room_resource)
 		draft_choice.drag_released.connect(
 			_on_draft_choice_drag_released
 		)
-		draft_choice.selected.connect(
-			_on_draft_choice_selected
-		)
-		draft_choice.drag_started.connect(
-			_on_draft_choice_drag_started
-		)
-		
-func _on_draft_choice_drag_released() -> void:
-	room_drag_released.emit()
-		
+
+		choices_container.add_child(draft_choice)
+
+	return true
+
 func clear_draft() -> void:
 	for child: Node in choices_container.get_children():
+		# Remove immediately so obsolete choices cannot remain active
+		# while waiting for queue_free() to finish.
+		choices_container.remove_child(child)
 		child.queue_free()
-		
-func _on_draft_choice_selected(
-	room_resource: RoomResource
-) -> void:
-	if room_resource == null:
-		push_error(
-			"DraftUI: Received a null RoomResource from DraftChoice."
-		)
-		return
 
-
-	room_selected.emit(room_resource)
-
-func _on_draft_choice_drag_started(
-	room_resource: RoomResource
-) -> void:
-	if room_resource == null:
-		push_error(
-			"DraftUI: Received a null RoomResource when drag started."
-		)
-		return
-
-	print("DraftUI received drag: ", room_resource.room_name)
-
-	hide()
-
-	room_drag_started.emit(room_resource)
-	
-	
+func _on_draft_choice_drag_released() -> void:
+	tenant_drag_released.emit()

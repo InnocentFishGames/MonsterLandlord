@@ -5,28 +5,34 @@ extends Node2D
 var room_size: Vector2i = Vector2i.ONE
 var cell_size: Vector2 = Vector2.ZERO
 var is_valid: bool = false
+
+
 func _ready() -> void:
 	z_index = 100
+	
+	
 func setup(
 	new_room_size: Vector2i,
 	new_cell_size: Vector2
-) -> void:
+) -> bool:
 	if new_room_size.x <= 0 or new_room_size.y <= 0:
 		push_error(
 			"PlacementPreview: Room size must be greater than zero."
 		)
-		return
+		return false
 
 	if new_cell_size.x <= 0.0 or new_cell_size.y <= 0.0:
 		push_error(
 			"PlacementPreview: Cell size must be greater than zero."
 		)
-		return
+		return false
 
 	room_size = new_room_size
 	cell_size = new_cell_size
 
 	queue_redraw()
+
+	return true
 
 func set_validity(new_is_valid: bool) -> void:
 	if is_valid == new_is_valid:

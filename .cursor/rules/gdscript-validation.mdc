@@ -1,0 +1,20 @@
+---
+description: Typed GDScript, no assert, validate at boundaries, ordinary returns for legal gameplay no.
+globs: "**/*.{gd,tscn}"
+alwaysApply: false
+---
+
+# GDScript and validation
+
+- Type variables, parameters, returns, signals, arrays, and dictionaries wherever practical.
+- Never use `assert`.
+- Validate Inspector dependencies during `initialize()` / `setup()`. Validate injected dependencies when accepting them. Validate uncertain data at the entry point.
+- Trust controlled internal calls and signals. Do not null-check a signal argument by default.
+- At commit time, check gameplay rules (bounds, occupancy, overlap). Preview checks and commit checks are different; keep both.
+- Use `is_instance_valid()` only when a stored node might have been freed.
+- Failed initialization must `push_error()` and return `false` so callers stop.
+- `push_error()` = broken configuration. `push_warning()` = unexpected but recoverable. Ordinary `return` / `return false` = expected gameplay rejection (occupied room, invalid placement).
+- Guard `_draw()` and similar callbacks that can run before setup.
+- Files and folders: `snake_case`. Classes and nodes: `PascalCase`. Organize by feature (`main/rooms/`, `main/draft/`, …).
+- Discrete input → input callbacks. State changes → signals. Continuous visuals → `_process()`. Physics → `_physics_process()`.
+---

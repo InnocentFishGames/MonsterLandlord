@@ -22,18 +22,15 @@ func setup(new_tenant_instance: TenantInstance) -> void:
 
 	queue_redraw()
 
-
 func _draw() -> void:
+	# Drawing may occur before a tenant has been supplied.
 	if tenant_instance == null:
 		return
 
-	if tenant_instance.tenant_resource == null:
-		return
-
-	# Temporary visual so we can see that a tenant exists.
-	# We'll replace this with actual artwork later.
+	# Setup already validated the tenant's resource.
+	# Room positions this node at the room's center.
 	draw_circle(
-		Vector2(128.0, 128.0),
+		Vector2.ZERO,
 		50.0,
 		Color.WHITE
 	)

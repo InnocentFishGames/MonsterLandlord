@@ -7,8 +7,33 @@ class_name GridComponent extends Node2D
 # The size of one room in the world in pixels
 @export var grid_size: Vector2 = Vector2(256, 256)
 
+
+func initialize() -> bool:
+	# Validate the building dimensions configured in the Inspector.
+	if columns <= 0 or rows <= 0:
+		push_error(
+			"GridComponent: Columns and rows must be greater than zero."
+		)
+		return false
+
+	# Mouse-to-grid conversion divides by these dimensions.
+	# Reject zero, negative, and non-finite values before use.
+	if (
+		not grid_size.is_finite()
+		or grid_size.x <= 0.0
+		or grid_size.y <= 0.0
+	):
+		push_error(
+			"GridComponent: Cell dimensions must be finite and greater than zero."
+		)
+		return false
+
+	return true
+	
+	
 func _ready() -> void:
 	queue_redraw()
+	
 	
 func grid_to_world_position(grid_position: Vector2i) -> Vector2:
 	# Convert a logical grid position into a world position

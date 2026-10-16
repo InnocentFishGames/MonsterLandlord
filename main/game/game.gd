@@ -3,17 +3,32 @@ extends Node2D
 
 
 # Major systems owned by this gameplay scene.
-#
-# Game knows which systems exist and is responsible for wiring their
-# dependencies together.
+# Game is responsible for wiring these systems together.
 @export var building: Building
 @export var placement_controller: PlacementController
 @export var draft_manager: DraftManager
+@export var resolution_manager: ResolutionManager
+@export var hud: HUD
+@export var month_manager: MonthManager
+
+var preview_room: RoomInstance = null
+var preview_tenant_resource: TenantResource = null
+
+# Temporary resource used to create starting rooms while testing.
+@export var starting_room_resource: RoomResource
+
 
 func _ready() -> void:
+	# Game validates references to the major systems it coordinates.
 	if building == null:
 		push_error(
 			"Game: Building has not been assigned in the Inspector."
+		)
+		return
+
+	if hud == null:
+		push_error(
+			"Game: HUD has not been assigned."
 		)
 		return
 
@@ -23,72 +38,166 @@ func _ready() -> void:
 		)
 		return
 
-	if building.grid_component == null:
-		push_error(
-			"Game: Building does not have a GridComponent assigned."
-		)
-		return
-
-	if building.room_container == null:
-		push_error(
-			"Game: Building does not have a RoomManager assigned."
-		)
-		return
 	if draft_manager == null:
 		push_error(
 			"Game: DraftManager has not been assigned in the Inspector."
 		)
 		return
+
+	if resolution_manager == null:
+		push_error(
+			"Game: ResolutionManager has not been assigned."
+		)
+		return
+	
+	if month_manager == null:
+		push_error(
+			"Game: MonthManager has not been assigned."
+		)
+		return
+		
+	# Each system validates its own configuration.
+	# Stop startup immediately if any required system fails.
+	if not building.initialize():
+		return
+
+	if not hud.initialize():
+		return
+
+	if not draft_manager.initialize():
+		return
+
+	if not month_manager.initialize():
+		return
+		
+	# Building's components are now initialized and safe to supply
+	# as dependencies to the placement controller.
+	if not placement_controller.setup(
+		building.grid_component,
+		building.room_container
+	):
+		return
+
+	# Connect gameplay events before creating rooms or starting drafts.
 	placement_controller.placement_confirmed.connect(
 		_on_placement_confirmed
 	)
-	placement_controller.setup(
-		building.grid_component,
-		building.room_container
-	)
-	draft_manager.room_drag_started.connect(
-		_on_room_drag_started
-	)
-	draft_manager.room_drag_released.connect(
-		_on_room_drag_released
+
+	building.room_container.tenant_assigned.connect(
+		_on_tenant_assigned
 	)
 
-func _on_room_drag_released() -> void:
-	placement_controller.release_placement()
+	building.room_container.room_added.connect(
+		_on_room_added
+	)
+
+	draft_manager.draft_ui.tenant_drag_released.connect(
+		_on_tenant_drag_released
+	)
 	
-func _on_room_drag_started(
-	room_resource: RoomResource
-) -> void:
-	if room_resource == null:
-		push_error(
-			"Game: Cannot start placement with a null RoomResource."
-		)
+	hud.next_month_requested.connect(
+		_on_next_month_requested
+	)
+	
+	hud.restart_requested.connect(
+		_on_restart_requested
+	)
+
+	# Begin gameplay only after configuration and connections succeed.
+	if not _create_test_rooms():
 		return
-	
 
-	placement_controller.start_placement(
-		room_resource
+	hud.rent_display.set_monthly_goal(
+		month_manager.current_month,
+		month_manager.rent_goal
 	)
+
+	_clear_rent_preview()
+
+	if not draft_manager.create_draft():
+		return
+
+func _create_test_rooms() -> bool:
+	# Validate the Inspector resource used for this test layout.
+	if starting_room_resource == null:
+		push_error(
+			"Game: StartingRoomResource has not been assigned."
+		)
+		return false
+
+	var starting_positions: Array[Vector2i] = [
+		Vector2i(0, 0),
+		Vector2i(1, 0),
+		Vector2i(2, 0)
+	]
+
+	for grid_position: Vector2i in starting_positions:
+		var room_instance: RoomInstance = RoomInstance.new(
+			starting_room_resource,
+			grid_position
+		)
+
+		var was_added: bool = building.room_container.add_room(
+			room_instance
+		)
+
+		if not was_added:
+			# Include the failed position to help locate the problem.
+			# Stop immediately instead of attempting the remaining rooms.
+			push_error(
+				"Game: Failed to create starting room at %s."
+				% grid_position
+			)
+			return false
+
+	# Every starting room was added successfully.
+	return true
+
+
+func _on_tenant_assigned(
+	_tenant_instance: TenantInstance
+) -> void:
+	if building.room_container.is_full():
+		_finish_month()
+		return
+
+	if not draft_manager.create_draft():
+		return
+
+
+func _finish_month() -> void:
+	# Both normal placement and an already-full building can
+	# complete a month using this shared operation.
+	draft_manager.close_draft()
+
+	var rent_result: RentResult = (
+		resolution_manager.resolve_building(
+			building.room_container
+		)
+	)
+
+	var goal_met: bool = month_manager.is_goal_met(
+		rent_result.total_rent
+	)
+
+	hud.rent_display.set_projected_rent(
+		rent_result.total_rent
+	)
+
+	hud.rent_display.show_month_result(
+		goal_met,
+		rent_result.total_rent,
+		month_manager.rent_goal
+	)
+
+	# Passing permits advancement; failing offers a fresh run.
+	hud.set_next_month_available(goal_met)
+	hud.set_restart_available(not goal_met)
+
+	
 func _on_placement_confirmed(
 	room_instance: RoomInstance
 ) -> void:
-	if room_instance == null:
-		push_error(
-			"Game: Cannot place room because room_instance is null."
-		)
-		return
-
-	if building == null:
-		push_error(
-			"Game: Cannot place room because building is null."
-		)
-		return
-
-	if building.room_container == null:
-		push_error(
-			"Game: Cannot place room because RoomManager is null."
-		)
-		return
 
 	var was_added: bool = building.room_container.add_room(
 		room_instance
@@ -101,4 +210,119 @@ func _on_placement_confirmed(
 		return
 
 	placement_controller.finish_placement()
+
+
+func _on_tenant_hovered(
+	room_instance: RoomInstance,
+	tenant_resource: TenantResource
+) -> void:
+	# Ignores repeated hover events for the same tenant and room.
+	# Godot may call _can_drop_data() repeatedly while the drag remains
+	# over one drop area.
+
+	if room_instance.is_occupied():
+		return
+
+	if (
+		preview_room == room_instance
+		and preview_tenant_resource == tenant_resource
+	):
+		return
+
+	preview_room = room_instance
+	preview_tenant_resource = tenant_resource
+
+	var projected_result: RentResult = (
+		resolution_manager.calculate_projected_rent(
+			building.room_container,
+			room_instance,
+			tenant_resource
+		)
+	)
+
+	hud.rent_display.set_projected_rent(
+		projected_result.total_rent
+	)
+
+
+func _on_tenant_drag_released() -> void:
+	# Recalculate even if no preview is active.
+	# A successful drop may have changed actual building rent.
+	_clear_rent_preview()
+
+
+func _on_room_added(room: Room) -> void:
+	room.tenant_hovered.connect(
+		_on_tenant_hovered
+	)
+
+	room.tenant_hover_ended.connect(
+		_on_tenant_hover_ended
+	)
+
+
+func _on_tenant_hover_ended(room_instance: RoomInstance) -> void:
+	# Only clear the preview belonging to the room we just left.
+	# This also ignores mouse exits when no preview is active.
+	if preview_room != room_instance:
+		return
+
+	_clear_rent_preview()
+
+
+func _clear_rent_preview() -> void:
+	# Remove the hypothetical placement from Game's preview state.
+	preview_room = null
+	preview_tenant_resource = null
+
+	# Calculate rent using only tenants actually assigned to rooms.
+	var current_result: RentResult = (
+		resolution_manager.resolve_building(
+			building.room_container
+		)
+	)
+
+	hud.rent_display.set_projected_rent(
+		current_result.total_rent
+	)
+
+
+func _on_next_month_requested() -> void:
+	# Hide advancement while preparing the new month.
+	hud.set_next_month_available(false)
+
+	# Rooms remain. Only non-permanent tenants leave.
+	building.room_container.remove_temporary_tenants()
+
+	month_manager.advance_month()
+
+	hud.rent_display.clear_month_result()
 	
+	hud.rent_display.set_monthly_goal(
+		month_manager.current_month,
+		month_manager.rent_goal
+	)
+
+	# Clear any cached preview and display rent from tenants who stayed.
+	_clear_rent_preview()
+
+	# If every room contains a permanent tenant, there are no vacancies
+	# to draft for. Resolve this month immediately.
+	if building.room_container.is_full():
+		_finish_month()
+		return
+
+	if not draft_manager.create_draft():
+		return
+
+
+func _on_restart_requested() -> void:
+	# Reload the current scene to rebuild the run from its saved
+	# Inspector configuration. Runtime month and tenant state reset.
+	var reload_error: Error = get_tree().reload_current_scene()
+
+	if reload_error != OK:
+		push_error(
+			"Game: Could not restart the current scene. Error code: %d."
+			% reload_error
+		)

@@ -1,8 +1,17 @@
 [gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://banynf8u6ilpf"]
 
+[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="1_d4eo4"]
 [ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_r5u1o"]
+[ext_resource type="Script" uid="uid://c3vpnia0ldwo7" path="res://main/resolution/effects/human_neighbor_rent_effect.gd" id="2_ksdip"]
+
+[sub_resource type="Resource" id="Resource_u7x3r"]
+script = ExtResource("2_ksdip")
+metadata/_custom_type_script = "uid://c3vpnia0ldwo7"
 
 [resource]
 script = ExtResource("1_r5u1o")
 tenant_name = "Vampire"
+tenant_type = 1
+is_permanent = true
+rent_effects = Array[ExtResource("1_d4eo4")]([SubResource("Resource_u7x3r")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

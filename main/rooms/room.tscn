@@ -2,10 +2,26 @@
 
 [ext_resource type="Script" uid="uid://vlubmhbwwe47" path="res://main/rooms/room.gd" id="1_byimd"]
 [ext_resource type="Script" uid="uid://b0ktkpbf6oq1x" path="res://main/tenants/tenant_visual.gd" id="2_o24wl"]
+[ext_resource type="Script" uid="uid://ca0sccyrn0j4b" path="res://main/rooms/tenan_drop_area.gd" id="3_25gao"]
 
-[node name="Room" type="Node2D" unique_id=234516273 node_paths=PackedStringArray("tenant_visual")]
+[node name="Room" type="Node2D" unique_id=234516273 node_paths=PackedStringArray("tenant_visual", "tenant_drop_area", "tenant_name_label")]
 script = ExtResource("1_byimd")
 tenant_visual = NodePath("TenantVisual")
+tenant_drop_area = NodePath("TenantDropArea")
+tenant_name_label = NodePath("TenantDropArea/NameLabel")
 
 [node name="TenantVisual" type="Node2D" parent="." unique_id=2115643022]
 script = ExtResource("2_o24wl")
+
+[node name="TenantDropArea" type="Control" parent="." unique_id=1340030551]
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 256.0
+offset_bottom = 256.0
+script = ExtResource("3_25gao")
+
+[node name="NameLabel" type="Label" parent="TenantDropArea" unique_id=1169133545]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

@@ -5,4 +5,5 @@
 [resource]
 script = ExtResource("1_l2t0h")
 tenant_name = "Werewolf"
+tenant_type = 2
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"
