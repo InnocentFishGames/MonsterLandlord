@@ -5,8 +5,6 @@ extends RefCounted
 var room_resource: RoomResource
 var grid_position: Vector2i
 
-# A room starts empty.
-# A TenantInstance can be assigned later.
 var tenant_instance: TenantInstance = null
 
 
@@ -32,10 +30,8 @@ func assign_tenant(
 		)
 		return false
 
+	# Occupied rooms rejecting a new tenant is normal gameplay.
 	if tenant_instance != null:
-		push_warning(
-			"RoomInstance: Cannot assign tenant because the room is already occupied."
-		)
 		return false
 
 	tenant_instance = new_tenant_instance
@@ -44,20 +40,10 @@ func assign_tenant(
 	
 func remove_tenant() -> TenantInstance:
 	if tenant_instance == null:
-		push_warning(
-			"RoomInstance: Cannot remove tenant because the room is already empty."
-		)
 		return null
 
 	var removed_tenant: TenantInstance = tenant_instance
-
 	tenant_instance = null
-#We return the removed tenant rather than just deleting the reference because 
-#later the game might need to know who left.
-#For example, end-of-month processing could eventually do:
-#Is tenant permanent?
-#NO → remove_tenant()
-#YES → leave them alone
 	return removed_tenant
 
 func is_occupied() -> bool:

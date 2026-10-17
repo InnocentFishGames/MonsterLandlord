@@ -115,21 +115,17 @@ func _process(_delta: float) -> void:
 
 func start_placement(
 	new_room_resource: RoomResource
-) -> void:
+) -> bool:
 	# RoomResource enters the component here.
 	if new_room_resource == null:
 		push_error(
 			"PlacementController: Cannot start placement with a null RoomResource."
 		)
-		return
+		return false
 
-	# This is a gameplay-state check, not dependency validation.
-	# We cannot start another placement while one is already active.
+	# Cannot start another placement while one is already active.
 	if room_resource != null:
-		push_warning(
-			"PlacementController: Cannot start a new placement while another placement is active."
-		)
-		return
+		return false
 
 	# Configure the preview before activating placement.
 	# If dimensions are invalid, leave placement inactive.
@@ -137,11 +133,12 @@ func start_placement(
 		new_room_resource.size,
 		grid_component.grid_size
 	):
-		return
+		return false
 
 	room_resource = new_room_resource
 
 	placement_preview.show()
+	return true
 
 func release_placement() -> void:
 	# Releasing without an active placement is an invalid state transition.

@@ -104,7 +104,6 @@ func _on_tenant_dropped(
 		tenant_instance
 	)
 
-	# An occupied room rejecting a tenant is normal gameplay.
 	if not was_assigned:
 		return
 
@@ -138,12 +137,7 @@ func _update_tenant_visual() -> void:
 
 
 func remove_tenant() -> TenantInstance:
-	# Removing from an empty room is a gameplay-state issue,
-	# not a broken dependency.
 	if not room_instance.is_occupied():
-		push_warning(
-			"Room: Cannot remove tenant because the room is empty."
-		)
 		return null
 
 	var removed_tenant: TenantInstance = (

@@ -134,24 +134,7 @@ func can_place_room(
 func is_grid_position_occupied(
 	grid_position: Vector2i
 ) -> bool:
-	for room_instance: RoomInstance in rooms:
-		var room_start: Vector2i = (
-			room_instance.grid_position
-		)
-
-		var room_end: Vector2i = (
-			room_start + room_instance.room_resource.size
-		)
-
-		if (
-			grid_position.x >= room_start.x
-			and grid_position.x < room_end.x
-			and grid_position.y >= room_start.y
-			and grid_position.y < room_end.y
-		):
-			return true
-
-	return false
+	return get_room_at_grid_position(grid_position) != null
 
 
 func is_full() -> bool:
@@ -174,10 +157,7 @@ func _on_room_tenant_assigned(
 func get_room_at_grid_position(
 	grid_position: Vector2i
 ) -> RoomInstance:
-	# Finds the room occupying a specific grid cell.
-	#
-	# This is useful for gameplay systems that need to inspect nearby
-	# rooms without knowing how RoomManager stores its room collection.
+	# A room occupies every cell in its footprint, not only its origin.
 
 	for room_instance: RoomInstance in rooms:
 		var room_start: Vector2i = room_instance.grid_position

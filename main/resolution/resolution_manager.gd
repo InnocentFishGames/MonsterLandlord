@@ -172,7 +172,6 @@ func _resolve_with_context(
 			context
 		)
 
-		result.room_rent[room_instance] = tenant_rent
 		result.total_rent += tenant_rent
 
 	return result

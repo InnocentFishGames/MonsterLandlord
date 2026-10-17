@@ -3,11 +3,12 @@
 [ext_resource type="Script" uid="uid://d1xew1gxltpon" path="res://main/ui/hud/hud.gd" id="1_pl8eb"]
 [ext_resource type="Script" uid="uid://du7nvd7epeq6t" path="res://main/ui/hud/rent_display.gd" id="1_rhrjo"]
 
-[node name="Hud" type="CanvasLayer" unique_id=1913822774 node_paths=PackedStringArray("rent_display", "next_month_button", "restart_button")]
+[node name="Hud" type="CanvasLayer" unique_id=1913822774 node_paths=PackedStringArray("rent_display", "next_month_button", "restart_button", "place_room_button")]
 script = ExtResource("1_pl8eb")
 rent_display = NodePath("RentDisplay")
 next_month_button = NodePath("RentDisplay/NextMonthButton")
 restart_button = NodePath("RentDisplay/RestartButton")
+place_room_button = NodePath("RentDisplay/PlaceRoomButton")
 
 [node name="RentDisplay" type="VBoxContainer" parent="." unique_id=1357739420 node_paths=PackedStringArray("monthly_goal_label", "projected_rent_label", "month_result_label")]
 offset_left = 811.0
@@ -29,6 +30,10 @@ text = "Projected Rent: $0"
 
 [node name="MonthResultLabel" type="Label" parent="RentDisplay" unique_id=470636561]
 layout_mode = 2
+
+[node name="PlaceRoomButton" type="Button" parent="RentDisplay" unique_id=1847263911]
+layout_mode = 2
+text = "Place Room"
 
 [node name="NextMonthButton" type="Button" parent="RentDisplay" unique_id=1306919280]
 layout_mode = 2

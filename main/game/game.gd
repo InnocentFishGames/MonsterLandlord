@@ -103,6 +103,14 @@ func _ready() -> void:
 		_on_restart_requested
 	)
 
+	hud.place_room_requested.connect(
+		_on_place_room_requested
+	)
+
+	placement_controller.placement_cancelled.connect(
+		_on_placement_cancelled
+	)
+
 	# Begin gameplay only after configuration and connections succeed.
 	if not _create_test_rooms():
 		return
@@ -193,8 +201,23 @@ func _finish_month() -> void:
 	# Passing permits advancement; failing offers a fresh run.
 	hud.set_next_month_available(goal_met)
 	hud.set_restart_available(not goal_met)
+	# Room acquisition is only for the active month, not result screens.
+	hud.set_place_room_available(false)
 
-	
+
+func _on_place_room_requested() -> void:
+	# Uses the same Luxury definition as the starting rooms.
+	# This is a test hook, not a reward or purchase.
+	hud.set_place_room_available(false)
+
+	if not placement_controller.start_placement(starting_room_resource):
+		hud.set_place_room_available(true)
+
+
+func _on_placement_cancelled() -> void:
+	hud.set_place_room_available(true)
+
+
 func _on_placement_confirmed(
 	room_instance: RoomInstance
 ) -> void:
@@ -207,9 +230,13 @@ func _on_placement_confirmed(
 		push_error(
 			"Game: RoomManager failed to add the confirmed room."
 		)
+		hud.set_place_room_available(true)
 		return
 
 	placement_controller.finish_placement()
+	hud.set_place_room_available(true)
+	# The new room is empty, so projected rent may change once tenants move.
+	_clear_rent_preview()
 
 
 func _on_tenant_hovered(
@@ -302,6 +329,8 @@ func _on_next_month_requested() -> void:
 		month_manager.current_month,
 		month_manager.rent_goal
 	)
+
+	hud.set_place_room_available(true)
 
 	# Clear any cached preview and display rent from tenants who stayed.
 	_clear_rent_preview()
