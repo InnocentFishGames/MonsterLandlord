@@ -238,3 +238,18 @@ func remove_temporary_tenants() -> void:
 		# Let Room perform the removal so its label, visual,
 		# and drop availability update alongside its stored data.
 		room.remove_tenant()
+
+
+func get_rooms_in_row(row: int) -> Array[RoomInstance]:
+	# Every room whose footprint covers this row, including tall rooms
+	# that start above it. Each room is listed once.
+	var rooms_in_row: Array[RoomInstance] = []
+
+	for room_instance: RoomInstance in rooms:
+		var first_row: int = room_instance.grid_position.y
+		var last_row: int = first_row + room_instance.room_resource.size.y - 1
+
+		if row >= first_row and row <= last_row:
+			rooms_in_row.append(room_instance)
+
+	return rooms_in_row

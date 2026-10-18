@@ -6,10 +6,12 @@
 [ext_resource type="Resource" uid="uid://bsnph88cvt52a" path="res://main/data/tenants/human.tres" id="3_tupwp"]
 [ext_resource type="Resource" uid="uid://banynf8u6ilpf" path="res://main/data/tenants/vampire.tres" id="4_321py"]
 [ext_resource type="Resource" uid="uid://khv8ya4f3e3v" path="res://main/data/tenants/werewolf.tres" id="5_f8w0a"]
+[ext_resource type="Resource" path="res://main/data/tenants/zombie.tres" id="6_zombie"]
+[ext_resource type="Resource" path="res://main/data/tenants/witch.tres" id="7_witch"]
 
 [node name="DraftManager" type="Node" unique_id=1332573867 node_paths=PackedStringArray("draft_ui")]
 script = ExtResource("1_xel72")
-available_tenants = Array[ExtResource("2_xoc4u")]([ExtResource("3_tupwp"), ExtResource("4_321py"), ExtResource("5_f8w0a")])
+available_tenants = Array[ExtResource("2_xoc4u")]([ExtResource("3_tupwp"), ExtResource("4_321py"), ExtResource("5_f8w0a"), ExtResource("6_zombie"), ExtResource("7_witch")])
 draft_ui = NodePath("DraftUI")
 
 [node name="DraftUI" parent="." unique_id=705700989 instance=ExtResource("1_86ovo")]

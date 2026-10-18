@@ -38,7 +38,11 @@ func _calculate_tenant_rent(
 		tenant_instance.tenant_resource
 	)
 
-	var rent: int = tenant_resource.base_rent
+	# Bell Tower bonuses count as base rent, so multipliers apply to them.
+	var rent: int = (
+		tenant_resource.base_rent
+		+ context.get_rent_bonus(room_instance)
+	)
 
 	# Apply tenant effects first.
 	rent = _apply_rent_effects(
@@ -163,15 +167,55 @@ func _resolve_with_context(
 		)
 	)
 
+	# Empty rooms never resolve, so drop them. The remaining list is the
+	# resolution order. Abilities ask the context for the room before or
+	# after a given room, which skips empty rooms in between.
+	var occupied_rooms: Array[RoomInstance] = []
+
 	for room_instance: RoomInstance in ordered_rooms:
-		if not context.is_room_occupied(room_instance):
-			continue
+		if context.is_room_occupied(room_instance):
+			occupied_rooms.append(room_instance)
 
-		var tenant_rent: int = _calculate_tenant_rent(
-			room_instance,
-			context
-		)
+	context.set_resolution_order(occupied_rooms)
 
-		result.total_rent += tenant_rent
+	for room_instance: RoomInstance in occupied_rooms:
+		resolve_room(room_instance, "", context, result)
 
 	return result
+
+
+func resolve_room(
+	room_instance: RoomInstance,
+	name_suffix: String,
+	context: ResolutionContext,
+	result: RentResult
+) -> void:
+	# Calculates one room's rent, adds it to the total, and logs the step.
+	# name_suffix marks replays in the log, e.g. " (replay)".
+	# Public because abilities such as EchoRoomAbility resolve other rooms.
+	var tenant_rent: int = _calculate_tenant_rent(
+		room_instance,
+		context
+	)
+
+	result.total_rent += tenant_rent
+
+	result.entries.append(
+		RentEntry.new(
+			room_instance.grid_position,
+			(
+				context.get_tenant(room_instance).tenant_resource.tenant_name
+				+ name_suffix
+			),
+			tenant_rent
+		)
+	)
+
+	# Then run the room's own abilities, e.g. Echo Room or Bell Tower.
+	for ability: RoomAbility in room_instance.room_resource.abilities:
+		ability.on_resolved(
+			room_instance,
+			context,
+			self,
+			result
+		)

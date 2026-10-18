@@ -5,6 +5,7 @@ extends VBoxContainer
 @export var monthly_goal_label: Label
 @export var projected_rent_label: Label
 @export var month_result_label: Label
+@export var resolution_log_label: Label
 
 
 func initialize() -> bool:
@@ -27,8 +28,15 @@ func initialize() -> bool:
 		)
 		return false
 
+	if resolution_log_label == null:
+		push_error(
+			"RentDisplay: Resolution Log Label has not been assigned."
+		)
+		return false
+
 	# No result should appear before the month finishes.
 	month_result_label.text = ""
+	resolution_log_label.text = ""
 
 	return true
 
@@ -61,6 +69,30 @@ func show_month_result(
 	)
 
 
+func show_resolution_log(entries: Array[RentEntry]) -> void:
+	# DEBUG: a plain-text log for checking resolution order while building
+	# the game. It may not appear in the final UI.
+	# One line per room, in the order the rooms were resolved.
+	var lines: Array[String] = []
+
+	for index: int in range(entries.size()):
+		var entry: RentEntry = entries[index]
+
+		lines.append(
+			"%d. Room (%d, %d) %s: $%d"
+			% [
+				index + 1,
+				entry.grid_position.x,
+				entry.grid_position.y,
+				entry.tenant_name,
+				entry.rent
+			]
+		)
+
+	resolution_log_label.text = "\n".join(lines)
+
+
 func clear_month_result() -> void:
 	# The previous result no longer applies to the new month.
 	month_result_label.text = ""
+	resolution_log_label.text = ""

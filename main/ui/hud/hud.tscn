@@ -10,7 +10,7 @@ next_month_button = NodePath("RentDisplay/NextMonthButton")
 restart_button = NodePath("RentDisplay/RestartButton")
 place_room_button = NodePath("RentDisplay/PlaceRoomButton")
 
-[node name="RentDisplay" type="VBoxContainer" parent="." unique_id=1357739420 node_paths=PackedStringArray("monthly_goal_label", "projected_rent_label", "month_result_label")]
+[node name="RentDisplay" type="VBoxContainer" parent="." unique_id=1357739420 node_paths=PackedStringArray("monthly_goal_label", "projected_rent_label", "month_result_label", "resolution_log_label")]
 offset_left = 811.0
 offset_top = 14.0
 offset_right = 952.0
@@ -19,6 +19,7 @@ script = ExtResource("1_rhrjo")
 monthly_goal_label = NodePath("MonthlyGoalLabel")
 projected_rent_label = NodePath("ProjectedRentLabel")
 month_result_label = NodePath("MonthResultLabel")
+resolution_log_label = NodePath("ResolutionLogLabel")
 
 [node name="MonthlyGoalLabel" type="Label" parent="RentDisplay" unique_id=957848856]
 layout_mode = 2
@@ -29,6 +30,9 @@ layout_mode = 2
 text = "Projected Rent: $0"
 
 [node name="MonthResultLabel" type="Label" parent="RentDisplay" unique_id=470636561]
+layout_mode = 2
+
+[node name="ResolutionLogLabel" type="Label" parent="RentDisplay" unique_id=1122334455]
 layout_mode = 2
 
 [node name="PlaceRoomButton" type="Button" parent="RentDisplay" unique_id=1847263911]

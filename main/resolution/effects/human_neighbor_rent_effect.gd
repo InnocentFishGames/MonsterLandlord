@@ -31,9 +31,8 @@ func apply(
 			context.get_tenant(neighbor_room)
 		)
 
-		if (
-			neighbor_tenant.tenant_resource.tenant_type
-			!= TenantResource.TenantType.HUMAN
+		if not neighbor_tenant.tenant_resource.has_tag(
+			TenantResource.Tag.HUMAN
 		):
 			continue
 

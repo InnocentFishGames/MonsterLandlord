@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TenantResource" format=3]
+
+[ext_resource type="Script" path="res://main/tenants/tenant_resource.gd" id="1_witch"]
+[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="2_effect"]
+[ext_resource type="Script" path="res://main/resolution/effects/distinct_neighbor_types_rent_effect.gd" id="3_types"]
+
+[sub_resource type="Resource" id="Resource_types"]
+script = ExtResource("3_types")
+
+[resource]
+script = ExtResource("1_witch")
+tenant_name = "Witch"
+tags = Array[int]([5])
+base_rent = 5
+rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_types")])
+metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

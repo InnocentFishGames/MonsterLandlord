@@ -5,4 +5,5 @@
 [resource]
 script = ExtResource("1_mvyhm")
 tenant_name = "Human"
+tags = Array[int]([0])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

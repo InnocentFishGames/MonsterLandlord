@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://vlubmhbwwe47" path="res://main/rooms/room.gd" id="1_byimd"]
 [ext_resource type="Script" uid="uid://b0ktkpbf6oq1x" path="res://main/tenants/tenant_visual.gd" id="2_o24wl"]
-[ext_resource type="Script" uid="uid://ca0sccyrn0j4b" path="res://main/rooms/tenan_drop_area.gd" id="3_25gao"]
+[ext_resource type="Script" uid="uid://ca0sccyrn0j4b" path="res://main/rooms/tenant_drop_area.gd" id="3_25gao"]
 
 [node name="Room" type="Node2D" unique_id=234516273 node_paths=PackedStringArray("tenant_visual", "tenant_drop_area", "tenant_name_label")]
 script = ExtResource("1_byimd")

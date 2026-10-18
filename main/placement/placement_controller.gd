@@ -77,6 +77,9 @@ func setup(
 
 	placement_preview.hide()
 	placement_controls.hide()
+	# _process() only needs to run while a room follows the mouse.
+	# start_placement() turns it on and _clear_placement() turns it off.
+	set_process(false)
 	# Dependencies are assigned and controls are connected.
 	return true
 
@@ -138,6 +141,7 @@ func start_placement(
 	room_resource = new_room_resource
 
 	placement_preview.show()
+	set_process(true)
 	return true
 
 func release_placement() -> void:
@@ -250,5 +254,6 @@ func _clear_placement() -> void:
 	is_current_position_valid = false
 	is_pending_placement = false
 
+	set_process(false)
 	placement_preview.hide()
 	placement_controls.hide()

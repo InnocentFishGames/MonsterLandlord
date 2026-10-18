@@ -1,9 +1,15 @@
 [gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://khv8ya4f3e3v"]
 
 [ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_l2t0h"]
+[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="2_effect"]
+[ext_resource type="Script" path="res://main/resolution/effects/pack_rent_effect.gd" id="3_pack"]
+
+[sub_resource type="Resource" id="Resource_pack"]
+script = ExtResource("3_pack")
 
 [resource]
 script = ExtResource("1_l2t0h")
 tenant_name = "Werewolf"
-tenant_type = 2
+tags = Array[int]([2])
+rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_pack")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

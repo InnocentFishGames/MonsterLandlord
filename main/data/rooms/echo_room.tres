@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RoomResource" format=3 uid="uid://lg0sfj3xb52f"]
+
+[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="1_room"]
+[ext_resource type="Script" uid="uid://dbpkgg487oyn3" path="res://main/resolution/abilities/room_ability.gd" id="2_ability"]
+[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="3_8r3r0"]
+[ext_resource type="Script" uid="uid://d8idmibyvyjh" path="res://main/resolution/abilities/echo_room_ability.gd" id="3_echo"]
+
+[sub_resource type="Resource" id="Resource_echo"]
+script = ExtResource("3_echo")
+
+[resource]
+script = ExtResource("1_room")
+room_name = "Echo Room"
+abilities = Array[ExtResource("2_ability")]([SubResource("Resource_echo")])
+metadata/_custom_type_script = "uid://rhmkawfqhsdc"

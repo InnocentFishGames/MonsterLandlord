@@ -55,19 +55,12 @@ func world_to_grid_position(world_position: Vector2) -> Vector2i:
 
 func is_valid_grid_position(grid_position: Vector2i) -> bool:
 	# Check whether a grid position exists inside the building.
-	if grid_position.x < 0:
-		return false
+	# Rect2i.has_point() counts the top-left edge as inside and the
+	# bottom-right edge as outside, which matches grid cell numbering
+	# (columns 0 to columns - 1, rows 0 to rows - 1).
+	var building_cells: Rect2i = Rect2i(0, 0, columns, rows)
 
-	if grid_position.x >= columns:
-		return false
-
-	if grid_position.y < 0:
-		return false
-
-	if grid_position.y >= rows:
-		return false
-
-	return true
+	return building_cells.has_point(grid_position)
 	
 func can_fit_room(
 	grid_position: Vector2i,

@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://c3vpnia0ldwo7"
 [resource]
 script = ExtResource("1_r5u1o")
 tenant_name = "Vampire"
-tenant_type = 1
+tags = Array[int]([1, 3])
 is_permanent = true
 rent_effects = Array[ExtResource("1_d4eo4")]([SubResource("Resource_u7x3r")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

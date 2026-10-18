@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="RoomResource" format=3 uid="uid://cn56hrbav7fqx"]
 
+[ext_resource type="Script" uid="uid://dbpkgg487oyn3" path="res://main/resolution/abilities/room_ability.gd" id="1_6fmh3"]
 [ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="1_882ow"]
 [ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="1_b6vsx"]
 [ext_resource type="Script" uid="uid://c0rhwyypby0qw" path="res://main/resolution/effects/multiply_rent_effect.gd" id="2_b6vsx"]

@@ -11,11 +11,11 @@ extends Node2D
 @export var hud: HUD
 @export var month_manager: MonthManager
 
-var preview_room: RoomInstance = null
-var preview_tenant_resource: TenantResource = null
-
 # Temporary resource used to create starting rooms while testing.
 @export var starting_room_resource: RoomResource
+# Temporary test scaffolding: the rooms created at game start, left to
+# right along the top row. Swap entries in the Inspector to try other rooms.
+@export var starting_rooms: Array[RoomResource] = []
 
 
 func _ready() -> void:
@@ -139,9 +139,18 @@ func _create_test_rooms() -> bool:
 		Vector2i(2, 0)
 	]
 
-	for grid_position: Vector2i in starting_positions:
+	if starting_rooms.size() != starting_positions.size():
+		push_error(
+			"Game: Starting Rooms needs exactly %d RoomResources."
+			% starting_positions.size()
+		)
+		return false
+
+	for index: int in range(starting_positions.size()):
+		var grid_position: Vector2i = starting_positions[index]
+
 		var room_instance: RoomInstance = RoomInstance.new(
-			starting_room_resource,
+			starting_rooms[index],
 			grid_position
 		)
 
@@ -165,12 +174,18 @@ func _create_test_rooms() -> bool:
 func _on_tenant_assigned(
 	_tenant_instance: TenantInstance
 ) -> void:
+	_continue_month()
+
+
+func _continue_month() -> void:
+	# Shared by tenant placement and the start of a new month.
+	# A full building has no vacancies left to draft for, so the month
+	# resolves now. Otherwise the player drafts another tenant.
 	if building.room_container.is_full():
 		_finish_month()
 		return
 
-	if not draft_manager.create_draft():
-		return
+	draft_manager.create_draft()
 
 
 func _finish_month() -> void:
@@ -197,6 +212,10 @@ func _finish_month() -> void:
 		rent_result.total_rent,
 		month_manager.rent_goal
 	)
+
+	# DEBUG: remove this line (and ResolutionLogLabel in hud.tscn) to hide
+	# the log. Nothing else depends on it.
+	hud.rent_display.show_resolution_log(rent_result.entries)
 
 	# Passing permits advancement; failing offers a fresh run.
 	hud.set_next_month_available(goal_met)
@@ -243,22 +262,10 @@ func _on_tenant_hovered(
 	room_instance: RoomInstance,
 	tenant_resource: TenantResource
 ) -> void:
-	# Ignores repeated hover events for the same tenant and room.
-	# Godot may call _can_drop_data() repeatedly while the drag remains
-	# over one drop area.
-
-	if room_instance.is_occupied():
-		return
-
-	if (
-		preview_room == room_instance
-		and preview_tenant_resource == tenant_resource
-	):
-		return
-
-	preview_room = room_instance
-	preview_tenant_resource = tenant_resource
-
+	# Godot may call _can_drop_data() repeatedly while a drag stays over
+	# one room, so this runs often. The calculation is cheap, so we simply
+	# recalculate each time instead of caching the last hover.
+	# TenantDropArea only reports hovers for empty rooms.
 	var projected_result: RentResult = (
 		resolution_manager.calculate_projected_rent(
 			building.room_container,
@@ -288,20 +295,14 @@ func _on_room_added(room: Room) -> void:
 	)
 
 
-func _on_tenant_hover_ended(room_instance: RoomInstance) -> void:
-	# Only clear the preview belonging to the room we just left.
-	# This also ignores mouse exits when no preview is active.
-	if preview_room != room_instance:
-		return
-
+func _on_tenant_hover_ended(_room_instance: RoomInstance) -> void:
+	# The pointer left a room, so show the real rent again.
+	# If it moved onto another room, that room's next hover event
+	# immediately replaces this with its own projection.
 	_clear_rent_preview()
 
 
 func _clear_rent_preview() -> void:
-	# Remove the hypothetical placement from Game's preview state.
-	preview_room = null
-	preview_tenant_resource = null
-
 	# Calculate rent using only tenants actually assigned to rooms.
 	var current_result: RentResult = (
 		resolution_manager.resolve_building(
@@ -335,14 +336,9 @@ func _on_next_month_requested() -> void:
 	# Clear any cached preview and display rent from tenants who stayed.
 	_clear_rent_preview()
 
-	# If every room contains a permanent tenant, there are no vacancies
-	# to draft for. Resolve this month immediately.
-	if building.room_container.is_full():
-		_finish_month()
-		return
-
-	if not draft_manager.create_draft():
-		return
+	# If every room contains a permanent tenant, this resolves the
+	# month immediately instead of drafting.
+	_continue_month()
 
 
 func _on_restart_requested() -> void:
