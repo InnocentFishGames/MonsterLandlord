@@ -24,6 +24,22 @@ func resolve_building(
 		context
 	)
 
+func resolve_weeks(
+	room_manager: RoomManager,
+	week_count: int
+) -> Array[RentResult]:
+	# Resolves the building once per week. Every week is a separate
+	# resolution with its own fresh context, so nothing from an earlier
+	# week (such as a Bell Tower bonus) carries into the next one.
+	# Week-specific changes, such as events, can later be passed in here.
+	var week_results: Array[RentResult] = []
+
+	for week: int in range(week_count):
+		week_results.append(resolve_building(room_manager))
+
+	return week_results
+
+
 func _calculate_tenant_rent(
 	room_instance: RoomInstance,
 	context: ResolutionContext

@@ -97,7 +97,7 @@ func add_rent_bonus(
 	amount: int
 ) -> void:
 	# Extra rent for this room's tenant for the rest of this resolution
-	# ("this month"). It lives here, not on the tenant, so previews never
+	# (that week). It lives here, not on the tenant, so previews never
 	# change real tenants.
 	rent_bonuses[room_instance] = get_rent_bonus(room_instance) + amount
 

@@ -6,6 +6,7 @@ extends VBoxContainer
 @export var projected_rent_label: Label
 @export var month_result_label: Label
 @export var resolution_log_label: Label
+@export var draft_round_label: Label
 
 
 func initialize() -> bool:
@@ -34,9 +35,16 @@ func initialize() -> bool:
 		)
 		return false
 
+	if draft_round_label == null:
+		push_error(
+			"RentDisplay: Draft Round Label has not been assigned."
+		)
+		return false
+
 	# No result should appear before the month finishes.
 	month_result_label.text = ""
 	resolution_log_label.text = ""
+	draft_round_label.text = ""
 
 	return true
 
@@ -48,14 +56,32 @@ func set_monthly_goal(month_number: int, amount: int) -> void:
 		% [month_number, amount]
 	)
 
-func set_projected_rent(amount: int) -> void:
-	projected_rent_label.text = "Projected Rent: $" + str(amount)
+
+func set_draft_round(current_round: int, total_rounds: int) -> void:
+	draft_round_label.text = (
+		"Draft round %d of %d"
+		% [current_round, total_rounds]
+	)
+
+
+func clear_draft_round() -> void:
+	# Drafting is over for this month.
+	draft_round_label.text = ""
+
+
+func set_projected_rent(weekly_rent: int, monthly_rent: int) -> void:
+	# The goal is compared with the whole month, so show both numbers.
+	projected_rent_label.text = (
+		"Projected Rent: $%d / week ($%d / month)"
+		% [weekly_rent, monthly_rent]
+	)
 
 
 func show_month_result(
 	goal_met: bool,
 	collected_rent: int,
-	rent_goal: int
+	rent_goal: int,
+	week_totals: Array[int]
 ) -> void:
 	# Game supplies the outcome. This display only formats it.
 	var result_text: String = "Month failed"
@@ -63,31 +89,50 @@ func show_month_result(
 	if goal_met:
 		result_text = "Month passed"
 
+	# Show each week's rent so the player can see how the total was made.
+	var week_texts: Array[String] = []
+
+	for week_total: int in week_totals:
+		week_texts.append("$%d" % week_total)
+
 	month_result_label.text = (
-		"%s — Collected: $%d / Goal: $%d"
-		% [result_text, collected_rent, rent_goal]
+		"%s — Collected: $%d / Goal: $%d\nWeeks: %s"
+		% [
+			result_text,
+			collected_rent,
+			rent_goal,
+			" + ".join(week_texts)
+		]
 	)
 
 
-func show_resolution_log(entries: Array[RentEntry]) -> void:
+func show_resolution_log(week_results: Array[RentResult]) -> void:
 	# DEBUG: a plain-text log for checking resolution order while building
 	# the game. It may not appear in the final UI.
-	# One line per room, in the order the rooms were resolved.
+	# One heading per week, then one line per room in resolution order.
 	var lines: Array[String] = []
 
-	for index: int in range(entries.size()):
-		var entry: RentEntry = entries[index]
+	for week_index: int in range(week_results.size()):
+		var week_result: RentResult = week_results[week_index]
 
 		lines.append(
-			"%d. Room (%d, %d) %s: $%d"
-			% [
-				index + 1,
-				entry.grid_position.x,
-				entry.grid_position.y,
-				entry.tenant_name,
-				entry.rent
-			]
+			"Week %d: $%d"
+			% [week_index + 1, week_result.total_rent]
 		)
+
+		for entry_index: int in range(week_result.entries.size()):
+			var entry: RentEntry = week_result.entries[entry_index]
+
+			lines.append(
+				"  %d. Room (%d, %d) %s: $%d"
+				% [
+					entry_index + 1,
+					entry.grid_position.x,
+					entry.grid_position.y,
+					entry.tenant_name,
+					entry.rent
+				]
+			)
 
 	resolution_log_label.text = "\n".join(lines)
 

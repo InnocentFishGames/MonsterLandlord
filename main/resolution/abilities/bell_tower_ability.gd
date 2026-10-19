@@ -4,7 +4,7 @@ extends RoomAbility
 
 # Used by: Bell Tower (data/rooms/bell_tower.tres).
 # When the room resolves, the tenant in the next occupied room gets extra
-# rent for the rest of this month's resolution. The bonus counts as base
+# rent for the rest of the week it resolves in. The bonus counts as base
 # rent, so multipliers apply to it. If the Bell Tower resolves again
 # (an Echo Room), the bonus stacks.
 

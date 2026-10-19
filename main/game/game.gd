@@ -107,6 +107,14 @@ func _ready() -> void:
 		_on_place_room_requested
 	)
 
+	hud.skip_draft_requested.connect(
+		_on_skip_draft_requested
+	)
+
+	hud.collect_rent_requested.connect(
+		_on_collect_rent_requested
+	)
+
 	placement_controller.placement_cancelled.connect(
 		_on_placement_cancelled
 	)
@@ -122,8 +130,9 @@ func _ready() -> void:
 
 	_clear_rent_preview()
 
-	if not draft_manager.create_draft():
-		return
+	draft_manager.start_month()
+	_continue_month()
+
 
 func _create_test_rooms() -> bool:
 	# Validate the Inspector resource used for this test layout.
@@ -178,44 +187,73 @@ func _on_tenant_assigned(
 
 
 func _continue_month() -> void:
-	# Shared by tenant placement and the start of a new month.
-	# A full building has no vacancies left to draft for, so the month
-	# resolves now. Otherwise the player drafts another tenant.
-	if building.room_container.is_full():
+	# Shared by tenant placement, skipped rounds, and the start of a month.
+	# The month goes on to rent collection when the building is full (no
+	# vacancies left) or when every draft round has been offered.
+	# Otherwise the next draft round is offered.
+	if (
+		building.room_container.is_full()
+		or not draft_manager.has_rounds_left()
+	):
 		_finish_month()
 		return
 
-	draft_manager.create_draft()
+	if not draft_manager.offer_next_draft():
+		return
+
+	hud.rent_display.set_draft_round(
+		draft_manager.rounds_offered,
+		draft_manager.rounds_per_month
+	)
+
+
+func _on_skip_draft_requested() -> void:
+	# Skipping uses up the current round without picking a tenant.
+	_continue_month()
+
+
+func _on_collect_rent_requested() -> void:
+	# Ends drafting early. Any rounds that are left are skipped.
+	_finish_month()
 
 
 func _finish_month() -> void:
-	# Both normal placement and an already-full building can
-	# complete a month using this shared operation.
+	# Normal placement, skipped rounds, and an already-full building can
+	# all complete a month using this shared operation.
 	draft_manager.close_draft()
+	hud.set_draft_controls_available(false)
+	hud.rent_display.clear_draft_round()
 
-	var rent_result: RentResult = (
-		resolution_manager.resolve_building(
-			building.room_container
+	# Each week is a fresh resolution. The weeks are added together and
+	# compared with the month's goal once.
+	var week_results: Array[RentResult] = (
+		resolution_manager.resolve_weeks(
+			building.room_container,
+			month_manager.weeks_per_month
 		)
 	)
 
-	var goal_met: bool = month_manager.is_goal_met(
-		rent_result.total_rent
-	)
+	var week_totals: Array[int] = []
+	var month_rent: int = 0
 
-	hud.rent_display.set_projected_rent(
-		rent_result.total_rent
-	)
+	for week_result: RentResult in week_results:
+		week_totals.append(week_result.total_rent)
+		month_rent += week_result.total_rent
+
+	var goal_met: bool = month_manager.is_goal_met(month_rent)
+
+	_clear_rent_preview()
 
 	hud.rent_display.show_month_result(
 		goal_met,
-		rent_result.total_rent,
-		month_manager.rent_goal
+		month_rent,
+		month_manager.rent_goal,
+		week_totals
 	)
 
 	# DEBUG: remove this line (and ResolutionLogLabel in hud.tscn) to hide
 	# the log. Nothing else depends on it.
-	hud.rent_display.show_resolution_log(rent_result.entries)
+	hud.rent_display.show_resolution_log(week_results)
 
 	# Passing permits advancement; failing offers a fresh run.
 	hud.set_next_month_available(goal_met)
@@ -274,9 +312,7 @@ func _on_tenant_hovered(
 		)
 	)
 
-	hud.rent_display.set_projected_rent(
-		projected_result.total_rent
-	)
+	_show_projected_rent(projected_result.total_rent)
 
 
 func _on_tenant_drag_released() -> void:
@@ -310,8 +346,16 @@ func _clear_rent_preview() -> void:
 		)
 	)
 
+	_show_projected_rent(current_result.total_rent)
+
+
+func _show_projected_rent(weekly_rent: int) -> void:
+	# For now every week is the same, so a month is the weekly rent times
+	# the number of weeks. Once events can change a single week, this is
+	# only an estimate.
 	hud.rent_display.set_projected_rent(
-		current_result.total_rent
+		weekly_rent,
+		weekly_rent * month_manager.weeks_per_month
 	)
 
 
@@ -332,9 +376,13 @@ func _on_next_month_requested() -> void:
 	)
 
 	hud.set_place_room_available(true)
+	hud.set_draft_controls_available(true)
 
 	# Clear any cached preview and display rent from tenants who stayed.
 	_clear_rent_preview()
+
+	# A new month offers a full set of draft rounds again.
+	draft_manager.start_month()
 
 	# If every room contains a permanent tenant, this resolves the
 	# month immediately instead of drafting.
