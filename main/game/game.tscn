@@ -5,15 +5,18 @@
 [ext_resource type="Resource" uid="uid://cn56hrbav7fqx" path="res://main/data/rooms/luxury_room.tres" id="2_ej72j"]
 [ext_resource type="PackedScene" uid="uid://uxjrul0r07a1" path="res://main/draft/draft_manager.tscn" id="2_gpuo4"]
 [ext_resource type="Script" uid="uid://bf2yegl5hmhlu" path="res://main/placement/placement_controller.gd" id="3_458dk"]
-[ext_resource type="Resource" path="res://main/data/rooms/bell_tower.tres" id="4_yo04u"]
+[ext_resource type="Resource" uid="uid://dp6e13xjqwbd3" path="res://main/data/rooms/bell_tower.tres" id="4_yo04u"]
 [ext_resource type="Script" uid="uid://b723qvf7mii3x" path="res://main/placement/placement_preview.gd" id="6_ux4xf"]
 [ext_resource type="Script" uid="uid://ckqfaqu5f84q3" path="res://main/resolution/resolution_manager.gd" id="7_ej72j"]
 [ext_resource type="PackedScene" uid="uid://dndn3mdbydo3x" path="res://main/ui/hud/hud.tscn" id="8_en41u"]
 [ext_resource type="Script" uid="uid://cv3q0dy48l0wy" path="res://main/month/month_manager.gd" id="8_u7x3r"]
 [ext_resource type="Resource" uid="uid://lg0sfj3xb52f" path="res://main/data/rooms/echo_room.tres" id="9_echo"]
 [ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="10_room"]
+[ext_resource type="Resource" uid="uid://bt4crhk3b6ao" path="res://main/data/rooms/banquet_hall.tres" id="11_banq"]
+[ext_resource type="Script" uid="uid://cml1e24t8ox2m" path="res://main/shop/shop_manager.gd" id="12_shopm"]
+[ext_resource type="PackedScene" path="res://main/shop/shop_ui.tscn" id="13_shopui"]
 
-[node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "placement_controller", "draft_manager", "resolution_manager", "hud", "month_manager")]
+[node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "placement_controller", "draft_manager", "resolution_manager", "hud", "month_manager", "shop_manager", "shop_ui")]
 script = ExtResource("1_gpuo4")
 building = NodePath("Building")
 placement_controller = NodePath("PlacementController")
@@ -21,7 +24,8 @@ draft_manager = NodePath("DraftManager")
 resolution_manager = NodePath("ResolutionManager")
 hud = NodePath("Hud")
 month_manager = NodePath("MonthManager")
-starting_room_resource = ExtResource("2_ej72j")
+shop_manager = NodePath("ShopManager")
+shop_ui = NodePath("ShopUI")
 starting_rooms = Array[ExtResource("10_room")]([ExtResource("4_yo04u"), ExtResource("9_echo"), ExtResource("2_ej72j")])
 
 [node name="Building" parent="." unique_id=1826555542 instance=ExtResource("1_3ni26")]
@@ -60,3 +64,9 @@ script = ExtResource("7_ej72j")
 script = ExtResource("8_u7x3r")
 
 [node name="Hud" parent="." unique_id=1913822774 instance=ExtResource("8_en41u")]
+
+[node name="ShopManager" type="Node" parent="." unique_id=701170332]
+script = ExtResource("12_shopm")
+available_rooms = Array[ExtResource("10_room")]([ExtResource("2_ej72j"), ExtResource("4_yo04u"), ExtResource("9_echo"), ExtResource("11_banq")])
+
+[node name="ShopUI" parent="." unique_id=307245663 instance=ExtResource("13_shopui")]

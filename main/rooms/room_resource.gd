@@ -4,6 +4,9 @@ extends Resource
 
 @export var room_name: String = ""
 @export var size: Vector2i = Vector2i.ONE
+# Cost in the between-month shop, and the text shown on its offer card.
+@export var price: int = 10
+@export_multiline var description: String = ""
 @export var rent_effects: Array[RentEffect] = []
 # Abilities that change how resolution flows (see RoomAbility), e.g. the
 # Echo Room or Bell Tower. Rent effects above change this room's rent.
@@ -11,6 +14,13 @@ extends Resource
 
 
 func validate() -> bool:
+	if price < 0:
+		push_error(
+			"RoomResource '%s': Price cannot be negative."
+			% room_name
+		)
+		return false
+
 	# Check Inspector-authored effects before this room enters gameplay.
 	for index: int in range(rent_effects.size()):
 		if rent_effects[index] == null:

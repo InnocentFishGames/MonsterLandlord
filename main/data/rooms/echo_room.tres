@@ -11,5 +11,7 @@ script = ExtResource("3_echo")
 [resource]
 script = ExtResource("1_room")
 room_name = "Echo Room"
+price = 12
+description = "Also resolves the room before it a second time."
 abilities = Array[ExtResource("2_ability")]([SubResource("Resource_echo")])
 metadata/_custom_type_script = "uid://rhmkawfqhsdc"

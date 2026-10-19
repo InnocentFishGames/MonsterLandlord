@@ -11,5 +11,6 @@ script = ExtResource("3_bell")
 [resource]
 script = ExtResource("1_room")
 room_name = "Bell Tower"
+description = "Gives the next tenant +$5 rent for the week."
 abilities = Array[ExtResource("2_ability")]([SubResource("Resource_bell")])
 metadata/_custom_type_script = "uid://rhmkawfqhsdc"

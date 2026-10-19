@@ -1,0 +1,71 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://main/shop/shop_ui.gd" id="1_shopui"]
+
+[node name="ShopUI" type="CanvasLayer" node_paths=PackedStringArray("shop_panel", "offers_container", "cash_label", "continue_button", "placement_bar", "placement_label", "back_button")]
+layer = 2
+script = ExtResource("1_shopui")
+shop_panel = NodePath("ShopPanel")
+offers_container = NodePath("ShopPanel/Layout/OffersContainer")
+cash_label = NodePath("ShopPanel/Layout/CashLabel")
+continue_button = NodePath("ShopPanel/Layout/ContinueButton")
+placement_bar = NodePath("PlacementBar")
+placement_label = NodePath("PlacementBar/Row/PlacementLabel")
+back_button = NodePath("PlacementBar/Row/BackButton")
+
+[node name="ShopPanel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -200.0
+offset_right = 400.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Layout" type="VBoxContainer" parent="ShopPanel"]
+layout_mode = 2
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="ShopPanel/Layout"]
+layout_mode = 2
+text = "Shop"
+horizontal_alignment = 1
+
+[node name="CashLabel" type="Label" parent="ShopPanel/Layout"]
+layout_mode = 2
+text = "Cash: $0"
+horizontal_alignment = 1
+
+[node name="OffersContainer" type="HBoxContainer" parent="ShopPanel/Layout"]
+layout_mode = 2
+alignment = 1
+
+[node name="ContinueButton" type="Button" parent="ShopPanel/Layout"]
+layout_mode = 2
+text = "Start Next Month"
+
+[node name="PlacementBar" type="PanelContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -500.0
+offset_top = 20.0
+offset_right = 500.0
+offset_bottom = 80.0
+grow_horizontal = 2
+
+[node name="Row" type="HBoxContainer" parent="PlacementBar"]
+layout_mode = 2
+
+[node name="PlacementLabel" type="Label" parent="PlacementBar/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="PlacementBar/Row"]
+layout_mode = 2
+text = "Back to Shop"

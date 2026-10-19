@@ -3,16 +3,15 @@
 [ext_resource type="Script" uid="uid://d1xew1gxltpon" path="res://main/ui/hud/hud.gd" id="1_pl8eb"]
 [ext_resource type="Script" uid="uid://du7nvd7epeq6t" path="res://main/ui/hud/rent_display.gd" id="1_rhrjo"]
 
-[node name="Hud" type="CanvasLayer" unique_id=1913822774 node_paths=PackedStringArray("rent_display", "next_month_button", "restart_button", "place_room_button", "skip_draft_button", "collect_rent_button")]
+[node name="Hud" type="CanvasLayer" unique_id=1913822774 node_paths=PackedStringArray("rent_display", "open_shop_button", "restart_button", "skip_draft_button", "collect_rent_button")]
 script = ExtResource("1_pl8eb")
 rent_display = NodePath("RentDisplay")
-next_month_button = NodePath("RentDisplay/NextMonthButton")
+open_shop_button = NodePath("RentDisplay/OpenShopButton")
 restart_button = NodePath("RentDisplay/RestartButton")
-place_room_button = NodePath("RentDisplay/PlaceRoomButton")
 skip_draft_button = NodePath("RentDisplay/SkipDraftButton")
 collect_rent_button = NodePath("RentDisplay/CollectRentButton")
 
-[node name="RentDisplay" type="VBoxContainer" parent="." unique_id=1357739420 node_paths=PackedStringArray("monthly_goal_label", "projected_rent_label", "month_result_label", "resolution_log_label", "draft_round_label")]
+[node name="RentDisplay" type="VBoxContainer" parent="." unique_id=1357739420 node_paths=PackedStringArray("monthly_goal_label", "projected_rent_label", "month_result_label", "resolution_log_label", "draft_round_label", "cash_label")]
 offset_left = 811.0
 offset_top = 14.0
 offset_right = 952.0
@@ -23,6 +22,7 @@ projected_rent_label = NodePath("ProjectedRentLabel")
 month_result_label = NodePath("MonthResultLabel")
 resolution_log_label = NodePath("ResolutionLogLabel")
 draft_round_label = NodePath("DraftRoundLabel")
+cash_label = NodePath("CashLabel")
 
 [node name="MonthlyGoalLabel" type="Label" parent="RentDisplay" unique_id=957848856]
 layout_mode = 2
@@ -31,6 +31,10 @@ text = "Monthly Goal: $0"
 [node name="ProjectedRentLabel" type="Label" parent="RentDisplay" unique_id=663027643]
 layout_mode = 2
 text = "Projected Rent: $0"
+
+[node name="CashLabel" type="Label" parent="RentDisplay"]
+layout_mode = 2
+text = "Cash: $0"
 
 [node name="DraftRoundLabel" type="Label" parent="RentDisplay" unique_id=2233445566]
 layout_mode = 2
@@ -49,13 +53,9 @@ text = "Skip Draft"
 layout_mode = 2
 text = "Collect Rent"
 
-[node name="PlaceRoomButton" type="Button" parent="RentDisplay" unique_id=1847263911]
+[node name="OpenShopButton" type="Button" parent="RentDisplay" unique_id=1306919280]
 layout_mode = 2
-text = "Place Room"
-
-[node name="NextMonthButton" type="Button" parent="RentDisplay" unique_id=1306919280]
-layout_mode = 2
-text = "Next Month"
+text = "Open Shop"
 
 [node name="RestartButton" type="Button" parent="RentDisplay" unique_id=719334135]
 layout_mode = 2

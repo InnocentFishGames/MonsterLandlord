@@ -205,6 +205,12 @@ func _is_mouse_over_preview() -> bool:
 
 
 func _on_cancel_button_pressed() -> void:
+	cancel_placement()
+
+
+func cancel_placement() -> void:
+	# Used by the Cancel button, and by the shop's "Back to Shop" button
+	# (which works before the room has been released on the grid).
 	if room_resource == null:
 		push_warning(
 			"PlacementController: Cannot cancel because no room is being placed."

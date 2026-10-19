@@ -7,6 +7,7 @@ extends VBoxContainer
 @export var month_result_label: Label
 @export var resolution_log_label: Label
 @export var draft_round_label: Label
+@export var cash_label: Label
 
 
 func initialize() -> bool:
@@ -38,6 +39,12 @@ func initialize() -> bool:
 	if draft_round_label == null:
 		push_error(
 			"RentDisplay: Draft Round Label has not been assigned."
+		)
+		return false
+
+	if cash_label == null:
+		push_error(
+			"RentDisplay: Cash Label has not been assigned."
 		)
 		return false
 
@@ -81,7 +88,8 @@ func show_month_result(
 	goal_met: bool,
 	collected_rent: int,
 	rent_goal: int,
-	week_totals: Array[int]
+	week_totals: Array[int],
+	cash_earned: int
 ) -> void:
 	# Game supplies the outcome. This display only formats it.
 	var result_text: String = "Month failed"
@@ -104,6 +112,10 @@ func show_month_result(
 			" + ".join(week_texts)
 		]
 	)
+
+	# Only a passed month earns cash.
+	if goal_met:
+		month_result_label.text += "\nCash earned: $%d" % cash_earned
 
 
 func show_resolution_log(week_results: Array[RentResult]) -> void:
@@ -141,3 +153,7 @@ func clear_month_result() -> void:
 	# The previous result no longer applies to the new month.
 	month_result_label.text = ""
 	resolution_log_label.text = ""
+
+
+func set_cash(amount: int) -> void:
+	cash_label.text = "Cash: $%d" % amount

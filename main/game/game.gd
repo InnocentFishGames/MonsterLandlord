@@ -11,11 +11,19 @@ extends Node2D
 @export var hud: HUD
 @export var month_manager: MonthManager
 
-# Temporary resource used to create starting rooms while testing.
-@export var starting_room_resource: RoomResource
+@export var shop_manager: ShopManager
+@export var shop_ui: ShopUI
 # Temporary test scaffolding: the rooms created at game start, left to
 # right along the top row. Swap entries in the Inspector to try other rooms.
 @export var starting_rooms: Array[RoomResource] = []
+
+# The player's cash. Game owns it and passes amounts to the interface.
+var wallet: Wallet = Wallet.new()
+# The rooms the shop currently offers. A bought room is removed from here.
+var current_offers: Array[RoomResource] = []
+# The room being placed after the player chose to buy it. It is only paid for
+# once the placement is confirmed.
+var pending_purchase: RoomResource = null
 
 
 func _ready() -> void:
@@ -55,7 +63,19 @@ func _ready() -> void:
 			"Game: MonthManager has not been assigned."
 		)
 		return
-		
+
+	if shop_manager == null:
+		push_error(
+			"Game: ShopManager has not been assigned in the Inspector."
+		)
+		return
+
+	if shop_ui == null:
+		push_error(
+			"Game: ShopUI has not been assigned in the Inspector."
+		)
+		return
+
 	# Each system validates its own configuration.
 	# Stop startup immediately if any required system fails.
 	if not building.initialize():
@@ -69,7 +89,13 @@ func _ready() -> void:
 
 	if not month_manager.initialize():
 		return
-		
+
+	if not shop_manager.initialize():
+		return
+
+	if not shop_ui.initialize():
+		return
+
 	# Building's components are now initialized and safe to supply
 	# as dependencies to the placement controller.
 	if not placement_controller.setup(
@@ -95,16 +121,28 @@ func _ready() -> void:
 		_on_tenant_drag_released
 	)
 	
-	hud.next_month_requested.connect(
-		_on_next_month_requested
+	hud.open_shop_requested.connect(
+		_on_open_shop_requested
 	)
-	
+
 	hud.restart_requested.connect(
 		_on_restart_requested
 	)
 
-	hud.place_room_requested.connect(
-		_on_place_room_requested
+	shop_ui.offer_selected.connect(
+		_on_shop_offer_selected
+	)
+
+	shop_ui.continue_requested.connect(
+		_on_shop_continue_requested
+	)
+
+	shop_ui.placement_back_requested.connect(
+		_on_shop_placement_back_requested
+	)
+
+	wallet.cash_changed.connect(
+		_on_cash_changed
 	)
 
 	hud.skip_draft_requested.connect(
@@ -128,6 +166,8 @@ func _ready() -> void:
 		month_manager.rent_goal
 	)
 
+	hud.rent_display.set_cash(wallet.cash)
+
 	_clear_rent_preview()
 
 	draft_manager.start_month()
@@ -135,13 +175,6 @@ func _ready() -> void:
 
 
 func _create_test_rooms() -> bool:
-	# Validate the Inspector resource used for this test layout.
-	if starting_room_resource == null:
-		push_error(
-			"Game: StartingRoomResource has not been assigned."
-		)
-		return false
-
 	var starting_positions: Array[Vector2i] = [
 		Vector2i(0, 0),
 		Vector2i(1, 0),
@@ -242,37 +275,70 @@ func _finish_month() -> void:
 
 	var goal_met: bool = month_manager.is_goal_met(month_rent)
 
+	# Surplus rent, the pass bonus, and rounds the player did not use are
+	# turned into cash. A failed month earns nothing.
+	var unused_rounds: int = (
+		draft_manager.rounds_per_month - draft_manager.rounds_offered
+	)
+	var cash_earned: int = month_manager.calculate_cash_earned(
+		month_rent,
+		unused_rounds
+	)
+	wallet.add_cash(cash_earned)
+
 	_clear_rent_preview()
 
 	hud.rent_display.show_month_result(
 		goal_met,
 		month_rent,
 		month_manager.rent_goal,
-		week_totals
+		week_totals,
+		cash_earned
 	)
 
 	# DEBUG: remove this line (and ResolutionLogLabel in hud.tscn) to hide
 	# the log. Nothing else depends on it.
 	hud.rent_display.show_resolution_log(week_results)
 
-	# Passing permits advancement; failing offers a fresh run.
-	hud.set_next_month_available(goal_met)
+	# Passing opens the shop; failing offers a fresh run.
+	hud.set_open_shop_available(goal_met)
 	hud.set_restart_available(not goal_met)
-	# Room acquisition is only for the active month, not result screens.
-	hud.set_place_room_available(false)
 
 
-func _on_place_room_requested() -> void:
-	# Uses the same Luxury definition as the starting rooms.
-	# This is a test hook, not a reward or purchase.
-	hud.set_place_room_available(false)
+func _on_cash_changed(new_amount: int) -> void:
+	hud.rent_display.set_cash(new_amount)
 
-	if not placement_controller.start_placement(starting_room_resource):
-		hud.set_place_room_available(true)
+
+func _on_open_shop_requested() -> void:
+	hud.set_open_shop_available(false)
+
+	current_offers = shop_manager.create_offers()
+	shop_ui.show_shop(current_offers, wallet.cash)
+
+
+func _on_shop_offer_selected(room_resource: RoomResource) -> void:
+	# The card is disabled when unaffordable, but check anyway so a stale
+	# click can never create a free room.
+	if not wallet.can_afford(room_resource.price):
+		return
+
+	# Nothing is paid yet. The cost is taken when the placement is confirmed,
+	# so cancelling needs no refund.
+	if not placement_controller.start_placement(room_resource):
+		return
+
+	pending_purchase = room_resource
+	shop_ui.show_placement(room_resource)
+
+
+func _on_shop_placement_back_requested() -> void:
+	# Works before the room has been dropped on the grid.
+	placement_controller.cancel_placement()
 
 
 func _on_placement_cancelled() -> void:
-	hud.set_place_room_available(true)
+	pending_purchase = null
+	shop_ui.show_shop(current_offers, wallet.cash)
 
 
 func _on_placement_confirmed(
@@ -287,13 +353,23 @@ func _on_placement_confirmed(
 		push_error(
 			"Game: RoomManager failed to add the confirmed room."
 		)
-		hud.set_place_room_available(true)
 		return
 
+	# Affordability was checked when the offer was chosen, and cash cannot
+	# change during placement, so this should always succeed.
+	if not wallet.try_spend(pending_purchase.price):
+		push_error(
+			"Game: Could not pay for the placed room. Cash changed during placement."
+		)
+
+	current_offers.erase(pending_purchase)
+	pending_purchase = null
+
 	placement_controller.finish_placement()
-	hud.set_place_room_available(true)
 	# The new room is empty, so projected rent may change once tenants move.
 	_clear_rent_preview()
+
+	shop_ui.show_shop(current_offers, wallet.cash)
 
 
 func _on_tenant_hovered(
@@ -359,9 +435,10 @@ func _show_projected_rent(weekly_rent: int) -> void:
 	)
 
 
-func _on_next_month_requested() -> void:
-	# Hide advancement while preparing the new month.
-	hud.set_next_month_available(false)
+func _on_shop_continue_requested() -> void:
+	# Leaving the shop starts the next month.
+	shop_ui.hide_shop()
+	current_offers.clear()
 
 	# Rooms remain. Only non-permanent tenants leave.
 	building.room_container.remove_temporary_tenants()
@@ -375,7 +452,6 @@ func _on_next_month_requested() -> void:
 		month_manager.rent_goal
 	)
 
-	hud.set_place_room_available(true)
 	hud.set_draft_controls_available(true)
 
 	# Clear any cached preview and display rent from tenants who stayed.

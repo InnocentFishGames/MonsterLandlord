@@ -11,5 +11,6 @@ script = ExtResource("3_banquet")
 [resource]
 script = ExtResource("1_room")
 room_name = "Banquet Hall"
+description = "Its tenant earns +$2 per distinct neighbor type."
 rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_banquet")])
 metadata/_custom_type_script = "uid://rhmkawfqhsdc"

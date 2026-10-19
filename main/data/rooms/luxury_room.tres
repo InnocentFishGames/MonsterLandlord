@@ -17,5 +17,7 @@ metadata/_custom_type_script = "uid://b4ek8eynrpsha"
 [resource]
 script = ExtResource("1_882ow")
 room_name = "Luxury"
+price = 15
+description = "Adds $5 to its tenant, then doubles their rent."
 rent_effects = Array[ExtResource("1_b6vsx")]([SubResource("Resource_en41u"), SubResource("Resource_c5m4h")])
 metadata/_custom_type_script = "uid://rhmkawfqhsdc"
