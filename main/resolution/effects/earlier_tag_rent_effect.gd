@@ -36,3 +36,8 @@ func apply(
 	return roundi(
 		float(current_rent) * pow(multiplier, earlier_count)
 	)
+
+
+func get_label() -> String:
+	# Short name shown in the rent breakdown.
+	return "Earlier same-type tenants"

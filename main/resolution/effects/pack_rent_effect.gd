@@ -43,3 +43,8 @@ func apply(
 			return current_rent
 
 	return roundi(float(current_rent) * multiplier)
+
+
+func get_label() -> String:
+	# Short name shown in the rent breakdown.
+	return "Pack"

@@ -133,6 +133,10 @@ func _ready() -> void:
 		_on_shop_offer_selected
 	)
 
+	shop_ui.reroll_requested.connect(
+		_on_shop_reroll_requested
+	)
+
 	shop_ui.continue_requested.connect(
 		_on_shop_continue_requested
 	)
@@ -163,6 +167,7 @@ func _ready() -> void:
 
 	hud.rent_display.set_monthly_goal(
 		month_manager.current_month,
+		month_manager.months_per_run,
 		month_manager.rent_goal
 	)
 
@@ -296,13 +301,18 @@ func _finish_month() -> void:
 		cash_earned
 	)
 
-	# DEBUG: remove this line (and ResolutionLogLabel in hud.tscn) to hide
-	# the log. Nothing else depends on it.
-	hud.rent_display.show_resolution_log(week_results)
+	# Shows how each room's rent was built, week by week.
+	hud.rent_display.show_rent_breakdown(week_results)
 
-	# Passing opens the shop; failing offers a fresh run.
-	hud.set_open_shop_available(goal_met)
-	hud.set_restart_available(not goal_met)
+	# The run ends on a failed month, or on passing the final month.
+	# Otherwise passing opens the shop before the next month.
+	var run_over: bool = (not goal_met) or month_manager.is_final_month()
+
+	if run_over:
+		hud.rent_display.show_run_outcome(goal_met)
+
+	hud.set_open_shop_available(not run_over)
+	hud.set_restart_available(run_over)
 
 
 func _on_cash_changed(new_amount: int) -> void:
@@ -312,8 +322,9 @@ func _on_cash_changed(new_amount: int) -> void:
 func _on_open_shop_requested() -> void:
 	hud.set_open_shop_available(false)
 
+	shop_manager.start_visit()
 	current_offers = shop_manager.create_offers()
-	shop_ui.show_shop(current_offers, wallet.cash)
+	_show_shop()
 
 
 func _on_shop_offer_selected(room_resource: RoomResource) -> void:
@@ -338,7 +349,7 @@ func _on_shop_placement_back_requested() -> void:
 
 func _on_placement_cancelled() -> void:
 	pending_purchase = null
-	shop_ui.show_shop(current_offers, wallet.cash)
+	_show_shop()
 
 
 func _on_placement_confirmed(
@@ -369,7 +380,7 @@ func _on_placement_confirmed(
 	# The new room is empty, so projected rent may change once tenants move.
 	_clear_rent_preview()
 
-	shop_ui.show_shop(current_offers, wallet.cash)
+	_show_shop()
 
 
 func _on_tenant_hovered(
@@ -449,6 +460,7 @@ func _on_shop_continue_requested() -> void:
 	
 	hud.rent_display.set_monthly_goal(
 		month_manager.current_month,
+		month_manager.months_per_run,
 		month_manager.rent_goal
 	)
 
@@ -475,3 +487,23 @@ func _on_restart_requested() -> void:
 			"Game: Could not restart the current scene. Error code: %d."
 			% reload_error
 		)
+
+
+func _show_shop() -> void:
+	# One place that gives the shop everything it displays.
+	shop_ui.show_shop(
+		current_offers,
+		wallet.cash,
+		shop_manager.get_reroll_price()
+	)
+
+
+func _on_shop_reroll_requested() -> void:
+	# Not being able to afford a reroll is normal. The button is disabled
+	# then, and this check covers a stale click.
+	if not wallet.try_spend(shop_manager.get_reroll_price()):
+		return
+
+	shop_manager.record_reroll()
+	current_offers = shop_manager.create_offers()
+	_show_shop()

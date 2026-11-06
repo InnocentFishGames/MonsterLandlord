@@ -22,6 +22,7 @@ enum Tag {
 
 
 @export var tenant_name: String = ""
+@export_multiline var description: String = ""
 @export var rarity: Rarity = Rarity.COMMON
 @export var tags: Array[Tag] = []
 @export var base_rent: int = 10
@@ -45,3 +46,26 @@ func validate() -> bool:
 			return false
 
 	return true
+
+
+func get_summary() -> String:
+	# Player-facing text shared by the draft cards and the room tooltips.
+	var tag_names: Array[String] = []
+
+	for tag: Tag in tags:
+		tag_names.append(Tag.keys()[tag].capitalize())
+
+	var lines: Array[String] = []
+	lines.append("Base rent: $%d" % base_rent)
+
+	if not tag_names.is_empty():
+		lines.append("Type: %s" % ", ".join(tag_names))
+
+	if is_permanent:
+		lines.append("Permanent: stays every month")
+
+	if description != "":
+		lines.append("")
+		lines.append(description)
+
+	return "\n".join(lines)

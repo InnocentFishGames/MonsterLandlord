@@ -10,6 +10,7 @@ signal drag_released()
 # depend on hardcoded NodePaths.
 @export var name_label: Label
 @export var rarity_label: Label
+@export var details_label: Label
 
 
 var tenant_resource: TenantResource = null
@@ -29,10 +30,17 @@ func setup(new_tenant_resource: TenantResource) -> bool:
 		)
 		return false
 
+	if details_label == null:
+		push_error(
+			"DraftChoice: DetailsLabel has not been assigned."
+		)
+		return false
+
 	# DraftManager has already validated the tenant pool.
 	tenant_resource = new_tenant_resource
 
 	name_label.text = tenant_resource.tenant_name
+	details_label.text = tenant_resource.get_summary()
 	rarity_label.text = TenantResource.Rarity.keys()[
 		tenant_resource.rarity
 	]

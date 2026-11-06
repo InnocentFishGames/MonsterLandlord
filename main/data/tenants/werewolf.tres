@@ -10,6 +10,7 @@ script = ExtResource("3_pack")
 [resource]
 script = ExtResource("1_l2t0h")
 tenant_name = "Werewolf"
+description = "Pack: if every room in its row holds a Werewolf (at least 2), each one doubles its rent."
 tags = Array[int]([2])
 rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_pack")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

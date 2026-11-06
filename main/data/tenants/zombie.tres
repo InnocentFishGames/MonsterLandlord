@@ -10,6 +10,7 @@ script = ExtResource("3_earlier")
 [resource]
 script = ExtResource("1_zombie")
 tenant_name = "Zombie"
+description = "Doubles its rent for each Zombie earlier in the building (top row first, left to right)."
 tags = Array[int]([4, 3])
 base_rent = 2
 rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_earlier")])

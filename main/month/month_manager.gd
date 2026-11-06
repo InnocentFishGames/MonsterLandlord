@@ -9,6 +9,8 @@ extends Node
 @export var rent_goal_increase: int = 50
 # The building is resolved this many times each month, once per week.
 @export var weeks_per_month: int = 4
+# A run lasts this many months. Passing the last one wins the run.
+@export var months_per_run: int = 8
 
 # Cash earned for a passed month (placeholders until the balance pass):
 # the rent above the goal, plus a flat bonus for passing, plus a bonus for
@@ -23,6 +25,12 @@ func initialize() -> bool:
 	if rent_goal <= 0:
 		push_error(
 			"MonthManager: Rent goal must be greater than zero."
+		)
+		return false
+
+	if months_per_run <= 0:
+		push_error(
+			"MonthManager: Months Per Run must be greater than zero."
 		)
 		return false
 
@@ -46,6 +54,10 @@ func initialize() -> bool:
 		return false
 
 	return true
+
+
+func is_final_month() -> bool:
+	return current_month >= months_per_run
 
 
 func is_goal_met(collected_rent: int) -> bool:

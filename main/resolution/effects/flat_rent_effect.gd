@@ -19,3 +19,8 @@ func apply(
 	# Adds a fixed amount to the rent accumulated so far.
 
 	return current_rent + rent_bonus
+
+
+func get_label() -> String:
+	# Short name shown in the rent breakdown.
+	return "Flat bonus"

@@ -56,11 +56,15 @@ func initialize() -> bool:
 	return true
 
 
-func set_monthly_goal(month_number: int, amount: int) -> void:
+func set_monthly_goal(
+	month_number: int,
+	total_months: int,
+	amount: int
+) -> void:
 	# Show both the current month and its requirement.
 	monthly_goal_label.text = (
-		"Month %d — Goal: $%d"
-		% [month_number, amount]
+		"Month %d of %d — Goal: $%d"
+		% [month_number, total_months, amount]
 	)
 
 
@@ -118,10 +122,9 @@ func show_month_result(
 		month_result_label.text += "\nCash earned: $%d" % cash_earned
 
 
-func show_resolution_log(week_results: Array[RentResult]) -> void:
-	# DEBUG: a plain-text log for checking resolution order while building
-	# the game. It may not appear in the final UI.
-	# One heading per week, then one line per room in resolution order.
+func show_rent_breakdown(week_results: Array[RentResult]) -> void:
+	# Explains where the rent came from: one heading per week, then one line
+	# per room in resolution order, showing each step that built its rent.
 	var lines: Array[String] = []
 
 	for week_index: int in range(week_results.size()):
@@ -136,12 +139,13 @@ func show_resolution_log(week_results: Array[RentResult]) -> void:
 			var entry: RentEntry = week_result.entries[entry_index]
 
 			lines.append(
-				"  %d. Room (%d, %d) %s: $%d"
+				"  %d. (%d, %d) %s: %s = $%d"
 				% [
 					entry_index + 1,
 					entry.grid_position.x,
 					entry.grid_position.y,
 					entry.tenant_name,
+					", ".join(entry.steps),
 					entry.rent
 				]
 			)
@@ -157,3 +161,11 @@ func clear_month_result() -> void:
 
 func set_cash(amount: int) -> void:
 	cash_label.text = "Cash: $%d" % amount
+
+
+func show_run_outcome(run_won: bool) -> void:
+	# The run is over, so add the final verdict under the month's result.
+	if run_won:
+		month_result_label.text += "\nYou survived every month. You win!"
+	else:
+		month_result_label.text += "\nYou could not pay. The run is over."

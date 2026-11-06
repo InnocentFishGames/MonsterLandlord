@@ -23,3 +23,8 @@ func apply(
 	)
 
 	return roundi(modified_rent)
+
+
+func get_label() -> String:
+	# Short name shown in the rent breakdown.
+	return "Multiplier"

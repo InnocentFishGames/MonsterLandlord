@@ -20,3 +20,8 @@ func apply(
 	room_instance: RoomInstance,
 	context: ResolutionContext
 ) -> int
+
+
+# A short player-facing name, shown in the rent breakdown.
+@abstract
+func get_label() -> String

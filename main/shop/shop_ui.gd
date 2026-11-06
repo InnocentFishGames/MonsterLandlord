@@ -6,6 +6,8 @@ extends CanvasLayer
 signal offer_selected(room_resource: RoomResource)
 # The player is done shopping.
 signal continue_requested()
+# The player paid to replace the offers with new ones.
+signal reroll_requested()
 # The player backed out of placing a room and wants the shop again.
 signal placement_back_requested()
 
@@ -15,6 +17,7 @@ signal placement_back_requested()
 @export var offers_container: HBoxContainer
 @export var cash_label: Label
 @export var continue_button: Button
+@export var reroll_button: Button
 # Shown instead of the shop screen while a purchased room is being placed.
 @export var placement_bar: Control
 @export var placement_label: Label
@@ -34,6 +37,10 @@ func initialize() -> bool:
 		push_error("ShopUI: Cash Label has not been assigned.")
 		return false
 
+	if reroll_button == null:
+		push_error("ShopUI: Reroll Button has not been assigned.")
+		return false
+
 	if continue_button == null:
 		push_error("ShopUI: Continue Button has not been assigned.")
 		return false
@@ -51,6 +58,7 @@ func initialize() -> bool:
 		return false
 
 	continue_button.pressed.connect(_on_continue_button_pressed)
+	reroll_button.pressed.connect(_on_reroll_button_pressed)
 	back_button.pressed.connect(_on_back_button_pressed)
 
 	hide_shop()
@@ -60,7 +68,8 @@ func initialize() -> bool:
 
 func show_shop(
 	offers: Array[RoomResource],
-	cash: int
+	cash: int,
+	reroll_price: int
 ) -> void:
 	# Rebuilds the cards each time, so a bought room simply disappears.
 	_clear_offers()
@@ -87,6 +96,8 @@ func show_shop(
 		offers_container.add_child(offer_button)
 
 	set_cash(cash)
+	reroll_button.text = "Reroll ($%d)" % reroll_price
+	reroll_button.disabled = reroll_price > cash
 	placement_bar.hide()
 	shop_panel.show()
 
@@ -123,6 +134,10 @@ func _clear_offers() -> void:
 
 func _on_offer_button_pressed(room_resource: RoomResource) -> void:
 	offer_selected.emit(room_resource)
+
+
+func _on_reroll_button_pressed() -> void:
+	reroll_requested.emit()
 
 
 func _on_continue_button_pressed() -> void:

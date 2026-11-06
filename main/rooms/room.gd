@@ -115,6 +115,7 @@ func _on_tenant_dropped(
 func _update_tenant_visual() -> void:
 	# Keep drop availability synchronized with actual occupancy.
 	tenant_drop_area.accepts_tenant = not room_instance.is_occupied()
+	_update_tooltip()
 
 	# Empty rooms have no tenant name or visible tenant.
 	if not room_instance.is_occupied():
@@ -170,3 +171,23 @@ func _on_tenant_hovered(
 	)
 func _on_tenant_drop_area_mouse_exited() -> void:
 	tenant_hover_ended.emit(room_instance)
+
+
+func _update_tooltip() -> void:
+	# Hovering a room explains the room, and its tenant if it has one.
+	var room_resource: RoomResource = room_instance.room_resource
+
+	var lines: Array[String] = [room_resource.room_name]
+
+	if room_resource.description != "":
+		lines.append(room_resource.description)
+
+	if room_instance.is_occupied():
+		var tenant_resource: TenantResource = (
+			room_instance.tenant_instance.tenant_resource
+		)
+		lines.append("")
+		lines.append(tenant_resource.tenant_name)
+		lines.append(tenant_resource.get_summary())
+
+	tenant_drop_area.tooltip_text = "\n".join(lines)

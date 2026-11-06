@@ -10,6 +10,7 @@ script = ExtResource("3_types")
 [resource]
 script = ExtResource("1_witch")
 tenant_name = "Witch"
+description = "Earns +$2 for each different monster type in adjacent rooms."
 tags = Array[int]([5])
 base_rent = 5
 rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_types")])

@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://bsnph88cvt52a"]
 
+[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="1_ii86q"]
 [ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_mvyhm"]
 
 [resource]
 script = ExtResource("1_mvyhm")
 tenant_name = "Human"
+description = "Earns plain rent. Vampires like having Humans next door."
 tags = Array[int]([0])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

@@ -42,7 +42,8 @@ func resolve_weeks(
 
 func _calculate_tenant_rent(
 	room_instance: RoomInstance,
-	context: ResolutionContext
+	context: ResolutionContext,
+	steps: Array[String]
 ) -> int:
 	# _resolve_with_context() only calls this for occupied rooms.
 	# Read through the context so hypothetical tenants work in previews.
@@ -60,12 +61,22 @@ func _calculate_tenant_rent(
 		+ context.get_rent_bonus(room_instance)
 	)
 
+	# Record how the rent is built, for the player-facing breakdown.
+	steps.append("base $%d" % tenant_resource.base_rent)
+
+	var rent_bonus: int = context.get_rent_bonus(room_instance)
+
+	if rent_bonus != 0:
+		steps.append("room bonus +$%d → $%d" % [rent_bonus, rent])
+
 	# Apply tenant effects first.
 	rent = _apply_rent_effects(
 		rent,
 		tenant_resource.rent_effects,
 		room_instance,
-		context
+		context,
+		steps,
+		tenant_resource.tenant_name
 	)
 
 	# Apply room effects afterward so rooms can amplify tenant rent.
@@ -73,7 +84,9 @@ func _calculate_tenant_rent(
 		rent,
 		room_instance.room_resource.rent_effects,
 		room_instance,
-		context
+		context,
+		steps,
+		room_instance.room_resource.room_name
 	)
 
 	return rent
@@ -120,7 +133,9 @@ func _apply_rent_effects(
 	current_rent: int,
 	rent_effects: Array[RentEffect],
 	room_instance: RoomInstance,
-	context: ResolutionContext
+	context: ResolutionContext,
+	steps: Array[String],
+	source_name: String
 ) -> int:
 	# Applies effects according to their declared stage so Inspector
 	# array order cannot change additive-versus-multiplicative behavior.
@@ -132,11 +147,20 @@ func _apply_rent_effects(
 			if rent_effect.get_stage() != stage:
 				continue
 
+			var rent_before: int = rent
+
 			rent = rent_effect.apply(
 				rent,
 				room_instance,
 				context
 			)
+
+			# Effects that changed nothing are left out to keep it short.
+			if rent != rent_before:
+				steps.append(
+					"%s %s → $%d"
+					% [source_name, rent_effect.get_label(), rent]
+				)
 
 	return rent
 
@@ -209,9 +233,11 @@ func resolve_room(
 	# Calculates one room's rent, adds it to the total, and logs the step.
 	# name_suffix marks replays in the log, e.g. " (replay)".
 	# Public because abilities such as EchoRoomAbility resolve other rooms.
+	var steps: Array[String] = []
 	var tenant_rent: int = _calculate_tenant_rent(
 		room_instance,
-		context
+		context,
+		steps
 	)
 
 	result.total_rent += tenant_rent
@@ -223,7 +249,8 @@ func resolve_room(
 				context.get_tenant(room_instance).tenant_resource.tenant_name
 				+ name_suffix
 			),
-			tenant_rent
+			tenant_rent,
+			steps
 		)
 	)
 

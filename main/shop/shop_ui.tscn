@@ -2,13 +2,14 @@
 
 [ext_resource type="Script" path="res://main/shop/shop_ui.gd" id="1_shopui"]
 
-[node name="ShopUI" type="CanvasLayer" node_paths=PackedStringArray("shop_panel", "offers_container", "cash_label", "continue_button", "placement_bar", "placement_label", "back_button")]
+[node name="ShopUI" type="CanvasLayer" node_paths=PackedStringArray("shop_panel", "offers_container", "cash_label", "continue_button", "reroll_button", "placement_bar", "placement_label", "back_button")]
 layer = 2
 script = ExtResource("1_shopui")
 shop_panel = NodePath("ShopPanel")
 offers_container = NodePath("ShopPanel/Layout/OffersContainer")
 cash_label = NodePath("ShopPanel/Layout/CashLabel")
 continue_button = NodePath("ShopPanel/Layout/ContinueButton")
+reroll_button = NodePath("ShopPanel/Layout/RerollButton")
 placement_bar = NodePath("PlacementBar")
 placement_label = NodePath("PlacementBar/Row/PlacementLabel")
 back_button = NodePath("PlacementBar/Row/BackButton")
@@ -43,6 +44,10 @@ horizontal_alignment = 1
 [node name="OffersContainer" type="HBoxContainer" parent="ShopPanel/Layout"]
 layout_mode = 2
 alignment = 1
+
+[node name="RerollButton" type="Button" parent="ShopPanel/Layout"]
+layout_mode = 2
+text = "Reroll"
 
 [node name="ContinueButton" type="Button" parent="ShopPanel/Layout"]
 layout_mode = 2

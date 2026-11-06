@@ -38,3 +38,8 @@ func apply(
 				seen_tags.append(tag)
 
 	return current_rent + seen_tags.size() * rent_per_type
+
+
+func get_label() -> String:
+	# Short name shown in the rent breakdown.
+	return "Neighbor variety"

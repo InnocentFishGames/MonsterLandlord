@@ -39,3 +39,8 @@ func apply(
 		bonus_rent += rent_per_human_neighbor
 
 	return current_rent + bonus_rent
+
+
+func get_label() -> String:
+	# Short name shown in the rent breakdown.
+	return "Human neighbors"
