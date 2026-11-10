@@ -25,44 +25,28 @@ enum Tag {
 @export_multiline var description: String = ""
 @export var rarity: Rarity = Rarity.COMMON
 @export var tags: Array[Tag] = []
-@export var base_rent: int = 10
-@export var is_permanent: bool = false
-@export var rent_effects: Array[RentEffect] = []
+# What the shop charges, in shop money.
+@export var shop_price: int = 4
+# What this tenant does when events happen, in the order they run. Rent
+# comes from abilities (for example FlatRentAbility), not from a base number.
+@export var abilities: Array[TenantAbility] = []
 
 
 func has_tag(tag: Tag) -> bool:
-	# Effects use this to ask "is this tenant a Human / Undead / ...?"
 	return tags.has(tag)
 
 
-func validate() -> bool:
-	# An empty effects array is valid; an empty entry is not.
-	for index: int in range(rent_effects.size()):
-		if rent_effects[index] == null:
-			push_error(
-				"TenantResource '%s': Rent effect slot %d is empty."
-				% [tenant_name, index]
-			)
-			return false
-
-	return true
-
-
 func get_summary() -> String:
-	# Player-facing text shared by the draft cards and the room tooltips.
+	# Player-facing text shared by the tenant cards and tooltips.
 	var tag_names: Array[String] = []
 
 	for tag: Tag in tags:
 		tag_names.append(Tag.keys()[tag].capitalize())
 
 	var lines: Array[String] = []
-	lines.append("Base rent: $%d" % base_rent)
 
 	if not tag_names.is_empty():
 		lines.append("Type: %s" % ", ".join(tag_names))
-
-	if is_permanent:
-		lines.append("Permanent: stays every month")
 
 	if description != "":
 		lines.append("")

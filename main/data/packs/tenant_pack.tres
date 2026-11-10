@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PackResource" format=3]
+
+[ext_resource type="Script" path="res://main/shop/pack_resource.gd" id="1_pack"]
+[ext_resource type="Script" path="res://main/tenants/tenant_resource.gd" id="2_tenant"]
+[ext_resource type="Resource" path="res://main/data/tenants/human.tres" id="3_human"]
+[ext_resource type="Resource" path="res://main/data/tenants/vampire.tres" id="4_vampire"]
+[ext_resource type="Resource" path="res://main/data/tenants/werewolf.tres" id="5_werewolf"]
+[ext_resource type="Resource" path="res://main/data/tenants/zombie.tres" id="6_zombie"]
+[ext_resource type="Resource" path="res://main/data/tenants/witch.tres" id="7_witch"]
+
+[resource]
+script = ExtResource("1_pack")
+pack_name = "Tenant Pack"
+description = "Shows 3 random tenants. Keep one."
+tenants = Array[ExtResource("2_tenant")]([ExtResource("3_human"), ExtResource("4_vampire"), ExtResource("5_werewolf"), ExtResource("6_zombie"), ExtResource("7_witch")])

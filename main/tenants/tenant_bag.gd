@@ -37,9 +37,6 @@ func setup(starting_tenants: Array[TenantResource]) -> bool:
 			)
 			return false
 
-		if not tenant_resource.validate():
-			return false
-
 		new_roster.append(TenantInstance.new(tenant_resource))
 
 	roster = new_roster
@@ -80,6 +77,10 @@ func discard(tenant_instance: TenantInstance) -> void:
 func return_all_to_bag() -> void:
 	# Round cleanup. Placed and discarded tenants all come back; nothing is
 	# permanently lost. The caller is responsible for emptying the building.
+	# Transformations do not last beyond the round.
+	for tenant_instance: TenantInstance in roster:
+		tenant_instance.reset_transformation()
+
 	bag = roster.duplicate()
 	discard_pile.clear()
 
@@ -90,3 +91,31 @@ func get_bag_size() -> int:
 
 func get_discard_size() -> int:
 	return discard_pile.size()
+
+
+func return_to_bag(tenant_instance: TenantInstance) -> void:
+	# Puts one tenant back into the bag mid-round (instead of the discard
+	# pile), so it can be drawn again this round.
+	if tenant_instance == null:
+		push_error("TenantBag: Cannot return a null TenantInstance.")
+		return
+
+	if not roster.has(tenant_instance):
+		push_warning(
+			"TenantBag: Returned a tenant that is not part of the roster."
+		)
+		return
+
+	bag.append(tenant_instance)
+
+
+func add_to_roster(tenant_resource: TenantResource) -> void:
+	# A tenant bought in the shop. It joins the roster for the rest of the run
+	# and is in the bag from now on.
+	if tenant_resource == null:
+		push_error("TenantBag: Cannot add a null TenantResource to the roster.")
+		return
+
+	var new_tenant: TenantInstance = TenantInstance.new(tenant_resource)
+	roster.append(new_tenant)
+	bag.append(new_tenant)

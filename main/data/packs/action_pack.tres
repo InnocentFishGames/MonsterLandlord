@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PackResource" format=3]
+
+[ext_resource type="Script" path="res://main/shop/pack_resource.gd" id="1_pack"]
+[ext_resource type="Script" path="res://main/actions/action_resource.gd" id="2_action"]
+[ext_resource type="Resource" path="res://main/data/actions/recruit.tres" id="3_recruit"]
+[ext_resource type="Resource" path="res://main/data/actions/random_arrivals.tres" id="4_random"]
+[ext_resource type="Resource" path="res://main/data/actions/swap.tres" id="5_swap"]
+[ext_resource type="Resource" path="res://main/data/actions/evict.tres" id="6_evict"]
+[ext_resource type="Resource" path="res://main/data/actions/trade.tres" id="7_trade"]
+[ext_resource type="Resource" path="res://main/data/actions/move.tres" id="8_move"]
+
+[resource]
+script = ExtResource("1_pack")
+pack_name = "Action Pack"
+description = "Shows 3 random action cards. Keep one."
+actions = Array[ExtResource("2_action")]([ExtResource("3_recruit"), ExtResource("4_random"), ExtResource("5_swap"), ExtResource("6_evict"), ExtResource("7_trade"), ExtResource("8_move")])

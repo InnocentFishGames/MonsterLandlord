@@ -2,18 +2,18 @@
 
 [ext_resource type="Script" uid="uid://crj8khccc7anw" path="res://main/building/building.gd" id="1_gkkqd"]
 [ext_resource type="Script" uid="uid://cdnx0f12gcrb5" path="res://main/building/grid_component.gd" id="2_k4wsm"]
-[ext_resource type="Script" uid="uid://db8unkrhu6rvv" path="res://main/rooms/room_manager.gd" id="3_7qwv5"]
-[ext_resource type="PackedScene" uid="uid://bwbta0gbx2bfe" path="res://main/rooms/room.tscn" id="4_7qwv5"]
+[ext_resource type="Script" path="res://main/building/building_view.gd" id="3_view"]
 
-[node name="Building" type="Node2D" unique_id=1826555542 node_paths=PackedStringArray("grid_component", "room_container")]
+[node name="Building" type="Node2D" unique_id=1826555542 node_paths=PackedStringArray("grid_component", "building_view")]
 script = ExtResource("1_gkkqd")
 grid_component = NodePath("GridComponent")
-room_container = NodePath("RoomManager")
+building_view = NodePath("BuildingView")
 
 [node name="GridComponent" type="Node2D" parent="." unique_id=2019904884]
 script = ExtResource("2_k4wsm")
+columns = 4
+rows = 4
 
-[node name="RoomManager" type="Node2D" parent="." unique_id=833183095 node_paths=PackedStringArray("grid_component")]
-script = ExtResource("3_7qwv5")
+[node name="BuildingView" type="Node2D" parent="." node_paths=PackedStringArray("grid_component")]
+script = ExtResource("3_view")
 grid_component = NodePath("../GridComponent")
-room_scene = ExtResource("4_7qwv5")

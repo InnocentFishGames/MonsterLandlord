@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ActionResource" format=3 uid="uid://cfgsgm2xbb1oc"]
+
+[ext_resource type="Script" uid="uid://pd0x5454twsm" path="res://main/actions/action_resource.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://bctwcp8ses0pl" path="res://main/actions/effects/action_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://b0eyj1sqv4j5v" path="res://main/actions/effects/choose_place_tenant_effect.gd" id="3_choose"]
+
+[sub_resource type="Resource" id="Resource_choose"]
+script = ExtResource("3_choose")
+
+[resource]
+script = ExtResource("1_action")
+action_name = "Recruit"
+description = "Draw 3 tenants. Keep one and place it on any empty cell. The others are discarded."
+effects = Array[ExtResource("2_effect")]([SubResource("Resource_choose")])

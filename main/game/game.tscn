@@ -2,71 +2,47 @@
 
 [ext_resource type="PackedScene" uid="uid://cjm4ojk766a8s" path="res://main/building/building.tscn" id="1_3ni26"]
 [ext_resource type="Script" uid="uid://wjmcmv7th0rp" path="res://main/game/game.gd" id="1_gpuo4"]
-[ext_resource type="Resource" uid="uid://cn56hrbav7fqx" path="res://main/data/rooms/luxury_room.tres" id="2_ej72j"]
-[ext_resource type="PackedScene" uid="uid://uxjrul0r07a1" path="res://main/draft/draft_manager.tscn" id="2_gpuo4"]
-[ext_resource type="Script" uid="uid://bf2yegl5hmhlu" path="res://main/placement/placement_controller.gd" id="3_458dk"]
-[ext_resource type="Resource" uid="uid://dp6e13xjqwbd3" path="res://main/data/rooms/bell_tower.tres" id="4_yo04u"]
-[ext_resource type="Script" uid="uid://b723qvf7mii3x" path="res://main/placement/placement_preview.gd" id="6_ux4xf"]
-[ext_resource type="Script" uid="uid://ckqfaqu5f84q3" path="res://main/resolution/resolution_manager.gd" id="7_ej72j"]
-[ext_resource type="PackedScene" uid="uid://dndn3mdbydo3x" path="res://main/ui/hud/hud.tscn" id="8_en41u"]
-[ext_resource type="Script" uid="uid://cv3q0dy48l0wy" path="res://main/month/month_manager.gd" id="8_u7x3r"]
-[ext_resource type="Resource" uid="uid://lg0sfj3xb52f" path="res://main/data/rooms/echo_room.tres" id="9_echo"]
-[ext_resource type="Script" uid="uid://rhmkawfqhsdc" path="res://main/rooms/room_resource.gd" id="10_room"]
-[ext_resource type="Resource" uid="uid://bt4crhk3b6ao" path="res://main/data/rooms/banquet_hall.tres" id="11_banq"]
-[ext_resource type="Script" uid="uid://cml1e24t8ox2m" path="res://main/shop/shop_manager.gd" id="12_shopm"]
-[ext_resource type="PackedScene" path="res://main/shop/shop_ui.tscn" id="13_shopui"]
+[ext_resource type="PackedScene" uid="uid://dndn3mdbydo3x" path="res://main/ui/hud/hud.tscn" id="2_hud"]
+[ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="3_tenant"]
+[ext_resource type="Resource" uid="uid://bsnph88cvt52a" path="res://main/data/tenants/human.tres" id="4_human"]
+[ext_resource type="Resource" uid="uid://banynf8u6ilpf" path="res://main/data/tenants/vampire.tres" id="5_vampire"]
+[ext_resource type="Resource" uid="uid://khv8ya4f3e3v" path="res://main/data/tenants/werewolf.tres" id="6_werewolf"]
+[ext_resource type="Resource" uid="uid://cfjalwfhynk2i" path="res://main/data/tenants/zombie.tres" id="7_zombie"]
+[ext_resource type="Resource" uid="uid://2i8ljn6iqbnv" path="res://main/data/tenants/witch.tres" id="8_witch"]
+[ext_resource type="Script" uid="uid://pd0x5454twsm" path="res://main/actions/action_resource.gd" id="9_action"]
+[ext_resource type="Resource" uid="uid://cfgsgm2xbb1oc" path="res://main/data/actions/recruit.tres" id="10_recruit"]
+[ext_resource type="Resource" uid="uid://dyhgkruus4kou" path="res://main/data/actions/random_arrivals.tres" id="11_random"]
+[ext_resource type="PackedScene" path="res://main/ui/tenant_choice/tenant_choice_ui.tscn" id="12_choice"]
+[ext_resource type="Resource" path="res://main/data/actions/swap.tres" id="13_swap"]
+[ext_resource type="Resource" path="res://main/data/actions/evict.tres" id="14_evict"]
+[ext_resource type="Resource" path="res://main/data/actions/trade.tres" id="15_trade"]
+[ext_resource type="Resource" path="res://main/data/actions/move.tres" id="16_move"]
+[ext_resource type="PackedScene" path="res://main/shop/shop_ui.tscn" id="17_shop"]
+[ext_resource type="Script" path="res://main/bonuses/persistent_bonus.gd" id="18_bonus"]
+[ext_resource type="Resource" path="res://main/data/bonuses/ledger.tres" id="19_ledger"]
+[ext_resource type="Resource" path="res://main/data/bonuses/crypt_fee.tres" id="20_crypt"]
+[ext_resource type="Script" path="res://main/shop/pack_resource.gd" id="21_packscript"]
+[ext_resource type="Resource" path="res://main/data/packs/tenant_pack.tres" id="22_tpack"]
+[ext_resource type="Resource" path="res://main/data/packs/action_pack.tres" id="23_apack"]
 
-[node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "placement_controller", "draft_manager", "resolution_manager", "hud", "month_manager", "shop_manager", "shop_ui")]
+[node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "hud", "tenant_choice_ui", "shop_ui")]
 script = ExtResource("1_gpuo4")
 building = NodePath("Building")
-placement_controller = NodePath("PlacementController")
-draft_manager = NodePath("DraftManager")
-resolution_manager = NodePath("ResolutionManager")
 hud = NodePath("Hud")
-month_manager = NodePath("MonthManager")
-shop_manager = NodePath("ShopManager")
+tenant_choice_ui = NodePath("TenantChoiceUI")
 shop_ui = NodePath("ShopUI")
-starting_rooms = Array[ExtResource("10_room")]([ExtResource("4_yo04u"), ExtResource("9_echo"), ExtResource("2_ej72j")])
+starting_tenants = Array[ExtResource("3_tenant")]([ExtResource("4_human"), ExtResource("4_human"), ExtResource("5_vampire"), ExtResource("5_vampire"), ExtResource("6_werewolf"), ExtResource("6_werewolf"), ExtResource("7_zombie"), ExtResource("7_zombie"), ExtResource("8_witch"), ExtResource("8_witch")])
+starting_actions = Array[ExtResource("9_action")]([ExtResource("10_recruit"), ExtResource("10_recruit"), ExtResource("11_random"), ExtResource("11_random"), ExtResource("11_random"), ExtResource("11_random"), ExtResource("11_random"), ExtResource("11_random"), ExtResource("13_swap"), ExtResource("13_swap"), ExtResource("14_evict"), ExtResource("15_trade"), ExtResource("16_move")])
+shop_tenants = Array[ExtResource("3_tenant")]([ExtResource("4_human"), ExtResource("5_vampire"), ExtResource("6_werewolf"), ExtResource("7_zombie"), ExtResource("8_witch")])
+shop_actions = Array[ExtResource("9_action")]([ExtResource("10_recruit"), ExtResource("11_random"), ExtResource("13_swap"), ExtResource("14_evict"), ExtResource("15_trade"), ExtResource("16_move")])
+shop_bonuses = Array[ExtResource("18_bonus")]([ExtResource("19_ledger"), ExtResource("20_crypt")])
+shop_packs = Array[ExtResource("21_packscript")]([ExtResource("22_tpack"), ExtResource("23_apack")])
 
 [node name="Building" parent="." unique_id=1826555542 instance=ExtResource("1_3ni26")]
+position = Vector2(64, 28)
 
-[node name="DraftManager" parent="." unique_id=1332573867 instance=ExtResource("2_gpuo4")]
+[node name="Hud" parent="." unique_id=1913822774 instance=ExtResource("2_hud")]
 
-[node name="PlacementController" type="Node2D" parent="." unique_id=579467177 node_paths=PackedStringArray("placement_preview", "placement_controls", "confirm_button", "cancel_button")]
-script = ExtResource("3_458dk")
-placement_preview = NodePath("PlacementPreview")
-placement_controls = NodePath("PlacementControl")
-confirm_button = NodePath("PlacementControl/ConfirmButton")
-cancel_button = NodePath("PlacementControl/CancelButton")
+[node name="TenantChoiceUI" parent="." unique_id=1450116046 instance=ExtResource("12_choice")]
 
-[node name="PlacementPreview" type="Node2D" parent="PlacementController" unique_id=619662537]
-script = ExtResource("6_ux4xf")
-
-[node name="PlacementControl" type="HBoxContainer" parent="PlacementController" unique_id=986127808]
-custom_minimum_size = Vector2(100, 50)
-offset_left = 100.0
-offset_top = 415.0
-offset_right = 140.0
-offset_bottom = 455.0
-
-[node name="ConfirmButton" type="Button" parent="PlacementController/PlacementControl" unique_id=403131173]
-layout_mode = 2
-text = "Confirm"
-
-[node name="CancelButton" type="Button" parent="PlacementController/PlacementControl" unique_id=1704687245]
-layout_mode = 2
-text = "Cancel"
-
-[node name="ResolutionManager" type="Node" parent="." unique_id=349156048]
-script = ExtResource("7_ej72j")
-
-[node name="MonthManager" type="Node" parent="." unique_id=635605168]
-script = ExtResource("8_u7x3r")
-
-[node name="Hud" parent="." unique_id=1913822774 instance=ExtResource("8_en41u")]
-
-[node name="ShopManager" type="Node" parent="." unique_id=701170332]
-script = ExtResource("12_shopm")
-available_rooms = Array[ExtResource("10_room")]([ExtResource("2_ej72j"), ExtResource("4_yo04u"), ExtResource("9_echo"), ExtResource("11_banq")])
-
-[node name="ShopUI" parent="." unique_id=307245663 instance=ExtResource("13_shopui")]
+[node name="ShopUI" parent="." unique_id=1131723551 instance=ExtResource("17_shop")]

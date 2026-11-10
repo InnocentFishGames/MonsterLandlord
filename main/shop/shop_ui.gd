@@ -2,26 +2,23 @@ class_name ShopUI
 extends CanvasLayer
 
 
-# The player picked a room to buy. Game starts the placement.
-signal offer_selected(room_resource: RoomResource)
-# The player is done shopping.
+# The player clicked an offer. Game decides whether the purchase works.
+signal offer_selected(offer: ShopOffer)
+# The player picked one item from an opened pack.
+signal pack_choice_selected(choice: ShopOffer)
+# The player is done shopping and wants the next round.
 signal continue_requested()
-# The player paid to replace the offers with new ones.
-signal reroll_requested()
-# The player backed out of placing a room and wants the shop again.
-signal placement_back_requested()
 
 
-# The shop screen: offers, cash, and the Continue button.
 @export var shop_panel: Control
-@export var offers_container: HBoxContainer
-@export var cash_label: Label
+@export var title_label: Label
+@export var money_label: Label
+# One button per offer. Rebuilt whenever the shop changes.
+@export var tenant_row: HBoxContainer
+@export var action_row: HBoxContainer
+# Bonuses and packs.
+@export var extra_row: HBoxContainer
 @export var continue_button: Button
-@export var reroll_button: Button
-# Shown instead of the shop screen while a purchased room is being placed.
-@export var placement_bar: Control
-@export var placement_label: Label
-@export var back_button: Button
 
 
 func initialize() -> bool:
@@ -29,120 +26,120 @@ func initialize() -> bool:
 		push_error("ShopUI: Shop Panel has not been assigned.")
 		return false
 
-	if offers_container == null:
-		push_error("ShopUI: Offers Container has not been assigned.")
+	if title_label == null:
+		push_error("ShopUI: Title Label has not been assigned.")
 		return false
 
-	if cash_label == null:
-		push_error("ShopUI: Cash Label has not been assigned.")
+	if money_label == null:
+		push_error("ShopUI: Money Label has not been assigned.")
 		return false
 
-	if reroll_button == null:
-		push_error("ShopUI: Reroll Button has not been assigned.")
+	if tenant_row == null:
+		push_error("ShopUI: Tenant Row has not been assigned.")
+		return false
+
+	if action_row == null:
+		push_error("ShopUI: Action Row has not been assigned.")
+		return false
+
+	if extra_row == null:
+		push_error("ShopUI: Extra Row has not been assigned.")
 		return false
 
 	if continue_button == null:
 		push_error("ShopUI: Continue Button has not been assigned.")
 		return false
 
-	if placement_bar == null:
-		push_error("ShopUI: Placement Bar has not been assigned.")
-		return false
-
-	if placement_label == null:
-		push_error("ShopUI: Placement Label has not been assigned.")
-		return false
-
-	if back_button == null:
-		push_error("ShopUI: Back Button has not been assigned.")
-		return false
-
 	continue_button.pressed.connect(_on_continue_button_pressed)
-	reroll_button.pressed.connect(_on_reroll_button_pressed)
-	back_button.pressed.connect(_on_back_button_pressed)
-
-	hide_shop()
+	shop_panel.hide()
 
 	return true
 
 
-func show_shop(
-	offers: Array[RoomResource],
-	cash: int,
-	reroll_price: int
-) -> void:
-	# Rebuilds the cards each time, so a bought room simply disappears.
-	_clear_offers()
-
-	for room_resource: RoomResource in offers:
-		# Placeholder card: a plain button until the final art exists.
-		var offer_button: Button = Button.new()
-		offer_button.custom_minimum_size = Vector2(220, 140)
-		offer_button.text = (
-			"%s\n$%d\n\n%s"
-			% [
-				room_resource.room_name,
-				room_resource.price,
-				room_resource.description
-			]
-		)
-		offer_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		# Rooms the player cannot afford are visible but not selectable.
-		offer_button.disabled = room_resource.price > cash
-		offer_button.pressed.connect(
-			_on_offer_button_pressed.bind(room_resource)
-		)
-
-		offers_container.add_child(offer_button)
-
-	set_cash(cash)
-	reroll_button.text = "Reroll ($%d)" % reroll_price
-	reroll_button.disabled = reroll_price > cash
-	placement_bar.hide()
+func show_shop(offers: Array[ShopOffer], shop_money: int) -> void:
+	refresh(offers, shop_money)
 	shop_panel.show()
 
 
 func hide_shop() -> void:
-	_clear_offers()
 	shop_panel.hide()
-	placement_bar.hide()
 
 
-func show_placement(room_resource: RoomResource) -> void:
-	# Hides the shop so the whole building is visible for placing the room.
-	shop_panel.hide()
-	placement_label.text = (
-		"Placing %s ($%d): %s"
-		% [
-			room_resource.room_name,
-			room_resource.price,
-			room_resource.description
-		]
-	)
-	placement_bar.show()
+func refresh(offers: Array[ShopOffer], shop_money: int) -> void:
+	title_label.text = "Shop"
+	money_label.text = "Shop money: $%d" % shop_money
+	continue_button.show()
+
+	_clear_rows()
+
+	for offer: ShopOffer in offers:
+		var offer_button: Button = _make_card_button()
+
+		if offer.is_sold:
+			offer_button.text = "%s\nSold" % offer.get_title()
+			offer_button.disabled = true
+		else:
+			offer_button.text = "%s  ($%d)\n%s" % [
+				offer.get_title(), offer.price, offer.get_text()
+			]
+			offer_button.disabled = offer.price > shop_money
+			offer_button.pressed.connect(
+				_on_offer_button_pressed.bind(offer)
+			)
+
+		_row_for(offer).add_child(offer_button)
 
 
-func set_cash(cash: int) -> void:
-	cash_label.text = "Cash: $%d" % cash
+func show_pack_choices(choices: Array[ShopOffer]) -> void:
+	# A pack is open: the player must pick one item before shopping on.
+	title_label.text = "Choose one"
+	continue_button.hide()
+
+	_clear_rows()
+
+	for choice: ShopOffer in choices:
+		var choice_button: Button = _make_card_button()
+		choice_button.text = "%s\n%s" % [choice.get_title(), choice.get_text()]
+		choice_button.pressed.connect(
+			_on_pack_choice_button_pressed.bind(choice)
+		)
+
+		_row_for(choice).add_child(choice_button)
 
 
-func _clear_offers() -> void:
-	for child: Node in offers_container.get_children():
-		offers_container.remove_child(child)
-		child.queue_free()
+func _make_card_button() -> Button:
+	# Placeholder card: a plain button until the final art exists.
+	var card_button: Button = Button.new()
+	card_button.custom_minimum_size = Vector2(300, 240)
+	card_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+	return card_button
 
 
-func _on_offer_button_pressed(room_resource: RoomResource) -> void:
-	offer_selected.emit(room_resource)
+func _row_for(offer: ShopOffer) -> HBoxContainer:
+	match offer.kind:
+		ShopOffer.Kind.TENANT:
+			return tenant_row
+		ShopOffer.Kind.ACTION:
+			return action_row
+		_:
+			return extra_row
 
 
-func _on_reroll_button_pressed() -> void:
-	reroll_requested.emit()
+func _clear_rows() -> void:
+	for row: HBoxContainer in [tenant_row, action_row, extra_row]:
+		for child: Node in row.get_children():
+			row.remove_child(child)
+			child.queue_free()
+
+
+func _on_offer_button_pressed(offer: ShopOffer) -> void:
+	offer_selected.emit(offer)
+
+
+func _on_pack_choice_button_pressed(choice: ShopOffer) -> void:
+	pack_choice_selected.emit(choice)
 
 
 func _on_continue_button_pressed() -> void:
 	continue_requested.emit()
-
-
-func _on_back_button_pressed() -> void:
-	placement_back_requested.emit()

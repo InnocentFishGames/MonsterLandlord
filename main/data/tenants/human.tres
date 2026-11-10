@@ -1,11 +1,16 @@
 [gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://bsnph88cvt52a"]
 
-[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="1_ii86q"]
 [ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_mvyhm"]
+[ext_resource type="Script" uid="uid://clj05mx6u14su" path="res://main/tenants/abilities/tenant_ability.gd" id="2_base"]
+[ext_resource type="Script" uid="uid://nu4tdpjrqsws" path="res://main/tenants/abilities/flat_rent_ability.gd" id="3_flat"]
+
+[sub_resource type="Resource" id="Resource_flat"]
+script = ExtResource("3_flat")
 
 [resource]
 script = ExtResource("1_mvyhm")
 tenant_name = "Human"
-description = "Earns plain rent. Vampires like having Humans next door."
+description = "Pays $10 rent at round end."
 tags = Array[int]([0])
+abilities = Array[ExtResource("2_base")]([SubResource("Resource_flat")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

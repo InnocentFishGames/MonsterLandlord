@@ -1,10 +1,10 @@
 class_name GridComponent extends Node2D
 
-# Number of rooms that can fit horizontally/vertically.
+# Number of cells across and down.
 @export var columns: int = 3
 @export var rows: int = 3
 
-# The size of one room in the world in pixels
+# The size of one cell in the world in pixels
 @export var grid_size: Vector2 = Vector2(256, 256)
 
 
@@ -37,7 +37,7 @@ func _ready() -> void:
 	
 func grid_to_world_position(grid_position: Vector2i) -> Vector2:
 	# Convert a logical grid position into a world position
-	#Rooms only need to know their grid position.The Building handles the actual pixel position.
+	# Tenants only need to know their grid position. The Building handles the actual pixel position.
 	# Grid (0, 0) -> World (0, 0)
 	# Grid (2, 2) -> World (512, 512)
 
@@ -62,27 +62,6 @@ func is_valid_grid_position(grid_position: Vector2i) -> bool:
 
 	return building_cells.has_point(grid_position)
 	
-func can_fit_room(
-	grid_position: Vector2i,
-	room_size: Vector2i
-) -> bool:
-	# Check that the room has a valid size.
-	if room_size.x <= 0 or room_size.y <= 0:
-		return false
-
-	# Calculate the last grid cell the room would occupy.
-	var end_position: Vector2i = grid_position + room_size - Vector2i.ONE
-
-	# Check both corners of the room.
-	if not is_valid_grid_position(grid_position):
-		return false
-
-	if not is_valid_grid_position(end_position):
-		return false
-
-	return true
-	
-
 func get_building_size() -> Vector2:
 	# Return the total pixel size of the building.
 	# So our 3x3 building is 768x768 pixels.

@@ -17,15 +17,15 @@ Rules for all code in this project. The user handles git and version control; do
 - Scene hierarchy reflects lifetime: a node is a child when freeing its parent should free it.
 - Node = scene-tree behavior. Resource = Inspector-editable or saved definitions. RefCounted = runtime objects without the scene tree.
 - Resources define content; systems run gameplay; instances hold individual state. Gameplay logic must not depend on visuals.
-- Shared definitions (RoomResource, TenantResource, effects) are read-only during play.
-- One source of truth per state. Use methods like `add_room()` / `assign_tenant()`; never modify another system's collections directly.
+- Shared definitions (ActionResource, TenantResource, effects) are read-only during play.
+- One source of truth per state. Use methods like `place_tenant()` / `remove_tenant()`; never modify another system's collections directly.
 - Initialization order: configure dependencies, connect signals, then start gameplay. Children run `_ready()` before parents. If `initialize()` / `setup()` fails, stop dependent work.
 - No Autoloads or global event bus for local gameplay.
 
 ## Code style
 - Static typing everywhere practical (variables, parameters, returns, signals, arrays, dictionaries). Descriptive names.
 - Never use `assert()`. Validate Inspector dependencies in `_ready()` / `setup()`, external arguments when invalid values are realistic, and resources/instances where ownership is accepted. Don't re-check state already guaranteed.
-- `push_error()` for broken requirements, `push_warning()` for recoverable or suspicious states. Expected rejections (e.g. occupied room) are normal gameplay, not errors. Error messages say what is missing and how to assign it.
+- `push_error()` for broken requirements, `push_warning()` for recoverable or suspicious states. Expected rejections (e.g. occupied cell) are normal gameplay, not errors. Error messages say what is missing and how to assign it.
 - Update mechanism: input callbacks for input, signals for state changes, `_process()` only while needed, `_physics_process()` for physics, timers for periodic work.
 - Simple typed data structures; add caches only for a demonstrated need.
 - Files organized by feature. snake_case files and folders, PascalCase classes and nodes.

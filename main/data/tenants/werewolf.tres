@@ -1,16 +1,20 @@
 [gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://khv8ya4f3e3v"]
 
 [ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_l2t0h"]
-[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="2_effect"]
-[ext_resource type="Script" uid="uid://cry8on3byy0ig" path="res://main/resolution/effects/pack_rent_effect.gd" id="3_pack"]
+[ext_resource type="Script" uid="uid://clj05mx6u14su" path="res://main/tenants/abilities/tenant_ability.gd" id="2_base"]
+[ext_resource type="Script" uid="uid://nu4tdpjrqsws" path="res://main/tenants/abilities/flat_rent_ability.gd" id="3_flat"]
+[ext_resource type="Script" uid="uid://dgx6fqqrl4er2" path="res://main/tenants/abilities/pack_rent_ability.gd" id="4_pack"]
+
+[sub_resource type="Resource" id="Resource_flat"]
+script = ExtResource("3_flat")
 
 [sub_resource type="Resource" id="Resource_pack"]
-script = ExtResource("3_pack")
+script = ExtResource("4_pack")
 
 [resource]
 script = ExtResource("1_l2t0h")
 tenant_name = "Werewolf"
-description = "Pack: if every room in its row holds a Werewolf (at least 2), each one doubles its rent."
+description = "Pays $10 rent. Pack: if every tenant in its row is a Werewolf (at least 2), pays $10 more."
 tags = Array[int]([2])
-rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_pack")])
+abilities = Array[ExtResource("2_base")]([SubResource("Resource_flat"), SubResource("Resource_pack")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

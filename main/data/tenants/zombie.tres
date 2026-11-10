@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="TenantResource" format=3 uid="uid://cfjalwfhynk2i"]
 
 [ext_resource type="Script" uid="uid://dn6g0ofsw37yq" path="res://main/tenants/tenant_resource.gd" id="1_zombie"]
-[ext_resource type="Script" uid="uid://cwayvxrf6e0dp" path="res://main/resolution/effects/rent_effects.gd" id="2_effect"]
-[ext_resource type="Script" uid="uid://gos6p77d6y70" path="res://main/resolution/effects/earlier_tag_rent_effect.gd" id="3_earlier"]
+[ext_resource type="Script" uid="uid://clj05mx6u14su" path="res://main/tenants/abilities/tenant_ability.gd" id="2_base"]
+[ext_resource type="Script" uid="uid://cvy5133xpxpl7" path="res://main/tenants/abilities/earlier_tag_rent_ability.gd" id="3_earlier"]
 
 [sub_resource type="Resource" id="Resource_earlier"]
 script = ExtResource("3_earlier")
@@ -10,8 +10,7 @@ script = ExtResource("3_earlier")
 [resource]
 script = ExtResource("1_zombie")
 tenant_name = "Zombie"
-description = "Doubles its rent for each Zombie earlier in the building (top row first, left to right)."
+description = "Pays $2 rent, doubled for each Zombie earlier in the building."
 tags = Array[int]([4, 3])
-base_rent = 2
-rent_effects = Array[ExtResource("2_effect")]([SubResource("Resource_earlier")])
+abilities = Array[ExtResource("2_base")]([SubResource("Resource_earlier")])
 metadata/_custom_type_script = "uid://dn6g0ofsw37yq"

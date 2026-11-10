@@ -104,10 +104,6 @@ func finish_play() -> void:
 	resolving_card = null
 
 
-func has_playable_cards() -> bool:
-	return not hand.is_empty()
-
-
 func _reshuffle_discard_into_draw_pile() -> void:
 	# Cards still in the hand stay there. Only the discard pile is shuffled.
 	if discard_pile.is_empty():
@@ -116,3 +112,13 @@ func _reshuffle_discard_into_draw_pile() -> void:
 	draw_pile = discard_pile.duplicate()
 	draw_pile.shuffle()
 	discard_pile.clear()
+
+
+func add_card(action_resource: ActionResource) -> void:
+	# A card bought in the shop. It joins the deck for the rest of the run and
+	# is dealt from the next round on.
+	if action_resource == null or not action_resource.validate():
+		push_error("ActionDeck: Cannot add an invalid ActionResource.")
+		return
+
+	cards.append(action_resource)

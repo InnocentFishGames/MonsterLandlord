@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ActionResource" format=3 uid="uid://dyhgkruus4kou"]
+
+[ext_resource type="Script" uid="uid://pd0x5454twsm" path="res://main/actions/action_resource.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://bctwcp8ses0pl" path="res://main/actions/effects/action_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://c6y1c7rv7uhj3" path="res://main/actions/effects/place_random_tenants_effect.gd" id="3_random"]
+
+[sub_resource type="Resource" id="Resource_random"]
+script = ExtResource("3_random")
+
+[resource]
+script = ExtResource("1_action")
+action_name = "Random Arrivals"
+description = "Draw 2 tenants and place them on random empty cells. Any that do not fit are discarded."
+effects = Array[ExtResource("2_effect")]([SubResource("Resource_random")])

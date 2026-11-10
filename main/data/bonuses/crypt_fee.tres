@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TagRentBonus" format=3]
+
+[ext_resource type="Script" path="res://main/bonuses/tag_rent_bonus.gd" id="1_bonus"]
+
+[resource]
+script = ExtResource("1_bonus")
+tag = 3
+amount_each = 4
+bonus_name = "Crypt Fee"
+description = "Adds $4 rent for every Undead tenant in the building at round end."

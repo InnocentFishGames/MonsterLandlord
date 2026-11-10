@@ -8,8 +8,15 @@ signal plays_changed(plays_remaining: int)
 signal round_ended()
 
 
+# Announces the rent total and its log after any change.
+signal rent_changed(rent_total: int, rent_log: Array[String])
+
+
 var plays_remaining: int = 0
 var is_active: bool = false
+# Rent earned this round, and one line per payment saying where it came from.
+var rent_total: int = 0
+var rent_log: Array[String] = []
 
 
 func start_round(play_count: int) -> bool:
@@ -19,9 +26,18 @@ func start_round(play_count: int) -> bool:
 
 	plays_remaining = play_count
 	is_active = true
+	rent_total = 0
+	rent_log.clear()
 	plays_changed.emit(plays_remaining)
+	rent_changed.emit(rent_total, rent_log)
 
 	return true
+
+
+func add_rent(amount: int, log_line: String) -> void:
+	rent_total += amount
+	rent_log.append(log_line)
+	rent_changed.emit(rent_total, rent_log)
 
 
 func can_afford_play(play_cost: int) -> bool:
