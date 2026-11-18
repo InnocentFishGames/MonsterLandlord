@@ -56,8 +56,12 @@ func initialize() -> bool:
 	return true
 
 
-func show_shop(offers: Array[ShopOffer], shop_money: int) -> void:
-	refresh(offers, shop_money)
+func show_shop(
+	offers: Array[ShopOffer],
+	shop_money: int,
+	items_full: bool
+) -> void:
+	refresh(offers, shop_money, items_full)
 	shop_panel.show()
 
 
@@ -65,7 +69,11 @@ func hide_shop() -> void:
 	shop_panel.hide()
 
 
-func refresh(offers: Array[ShopOffer], shop_money: int) -> void:
+func refresh(
+	offers: Array[ShopOffer],
+	shop_money: int,
+	items_full: bool
+) -> void:
 	title_label.text = "Shop"
 	money_label.text = "Shop money: $%d" % shop_money
 	continue_button.show()
@@ -83,6 +91,12 @@ func refresh(offers: Array[ShopOffer], shop_money: int) -> void:
 				offer.get_title(), offer.price, offer.get_text()
 			]
 			offer_button.disabled = offer.price > shop_money
+
+			# Items need a free slot. Say so instead of ignoring the click.
+			if offer.kind == ShopOffer.Kind.ITEM and items_full:
+				offer_button.disabled = true
+				offer_button.text += "
+(item slots full)"
 			offer_button.pressed.connect(
 				_on_offer_button_pressed.bind(offer)
 			)

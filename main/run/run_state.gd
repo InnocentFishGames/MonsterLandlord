@@ -6,6 +6,9 @@ extends RefCounted
 # high the rent goal is, and the player's shop money (a separate currency
 # from rent). Game creates this once and passes amounts to the interface.
 
+# How many items the player can hold at once.
+const ITEM_SLOT_COUNT: int = 2
+
 var current_round: int = 1
 var total_rounds: int = 8
 var starting_goal: int = 60
@@ -13,6 +16,8 @@ var goal_increase: int = 20
 var shop_money: int = 0
 # Bonuses bought this run, in the order they were bought.
 var bonuses: Array[PersistentBonus] = []
+# Items waiting to be used. At most ITEM_SLOT_COUNT.
+var items: Array[ItemResource] = []
 
 
 func start_run(
@@ -39,6 +44,7 @@ func start_run(
 	current_round = 1
 	shop_money = 0
 	bonuses.clear()
+	items.clear()
 
 	return true
 
@@ -82,3 +88,29 @@ func add_bonus(bonus: PersistentBonus) -> void:
 		return
 
 	bonuses.append(bonus)
+
+
+func has_free_item_slot() -> bool:
+	return items.size() < ITEM_SLOT_COUNT
+
+
+func add_item(item: ItemResource) -> bool:
+	# A full inventory is normal gameplay, so reject quietly.
+	if item == null:
+		push_error("RunState: Cannot add a null ItemResource.")
+		return false
+
+	if not has_free_item_slot():
+		return false
+
+	items.append(item)
+
+	return true
+
+
+func remove_item(index: int) -> void:
+	if index < 0 or index >= items.size():
+		push_error("RunState: No item in slot %d." % index)
+		return
+
+	items.remove_at(index)

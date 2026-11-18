@@ -11,4 +11,9 @@ func execute(
 	source_tenant: TenantInstance,
 	source_position: Vector2i
 ) -> void:
-	context.add_rent(amount, source_tenant, source_position, "Base rent")
+	context.add_rent(
+		amount + source_tenant.base_rent_bonus,
+		source_tenant,
+		source_position,
+		"Base rent"
+	)

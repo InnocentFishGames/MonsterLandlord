@@ -31,7 +31,7 @@ func _make_context() -> ActionContext:
 	])
 	var building_state: BuildingState = BuildingState.new()
 	building_state.setup(4, 4)
-	return ActionContext.new(tenant_bag, building_state)
+	return ActionContext.new(tenant_bag, building_state, RunState.new())
 
 
 func _answer_cells(context: ActionContext, answers: Array[Vector2i]) -> void:
@@ -161,7 +161,7 @@ func _ready() -> void:
 	human_bag.setup([_res("human"), _res("human")])
 	var human_state: BuildingState = BuildingState.new()
 	human_state.setup(4, 4)
-	context = ActionContext.new(human_bag, human_state)
+	context = ActionContext.new(human_bag, human_state, RunState.new())
 	var first_human: TenantInstance = human_bag.roster[0]
 	var second_human: TenantInstance = human_bag.roster[1]
 	human_bag.bag = [second_human]

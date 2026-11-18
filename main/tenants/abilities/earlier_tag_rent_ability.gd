@@ -34,7 +34,10 @@ func execute(
 			earlier_count += 1
 
 	context.add_rent(
-		roundi(float(base_amount) * pow(multiplier, earlier_count)),
+		roundi(
+			float(base_amount + source_tenant.base_rent_bonus)
+			* pow(multiplier, earlier_count)
+		),
 		source_tenant,
 		source_position,
 		"%d earlier %s" % [

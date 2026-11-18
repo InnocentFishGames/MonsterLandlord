@@ -8,6 +8,8 @@ signal action_card_selected(action_resource: ActionResource)
 signal end_round_requested()
 # The run ended (won or lost) and the player wants to try again.
 signal restart_requested()
+# The player clicked an item slot. Game decides what that means.
+signal item_selected(slot_index: int)
 
 
 # Round number, rent goal and shop money.
@@ -24,6 +26,8 @@ signal restart_requested()
 # Tells the player what to do next, e.g. "Click a highlighted cell".
 @export var prompt_label: Label
 # Holds one button per card in the hand. Rebuilt whenever the hand changes.
+# One button per item slot (filled or empty). Rebuilt when items change.
+@export var items_container: HBoxContainer
 @export var hand_container: VBoxContainer
 @export var end_round_button: Button
 @export var restart_button: Button
@@ -64,6 +68,10 @@ func initialize() -> bool:
 
 	if prompt_label == null:
 		push_error("HUD: Prompt Label has not been assigned.")
+		return false
+
+	if items_container == null:
+		push_error("HUD: Items Container has not been assigned.")
 		return false
 
 	if hand_container == null:
@@ -168,6 +176,7 @@ func _update_controls() -> void:
 	# While the round runs the player can play cards or end it. When the run
 	# is over they can only start a new one.
 	hand_container.visible = _is_round_active and not _is_locked
+	items_container.visible = _is_round_active and not _is_locked
 	end_round_button.visible = _is_round_active
 	end_round_button.disabled = _is_locked
 	restart_button.visible = _is_run_over
@@ -230,3 +239,43 @@ func set_bonuses(bonuses: Array[PersistentBonus]) -> void:
 		names.append(bonus.bonus_name)
 
 	bonuses_label.text = "Bonuses: " + ", ".join(names)
+
+
+func set_items(
+	items: Array[ItemResource],
+	slot_count: int,
+	usable_flags: Array[bool]
+) -> void:
+	# One button per slot. Empty slots are shown so the player can see how
+	# many items they can still carry.
+	for child: Node in items_container.get_children():
+		items_container.remove_child(child)
+		child.queue_free()
+
+	for slot_index: int in range(slot_count):
+		var slot_button: Button = Button.new()
+		slot_button.custom_minimum_size = Vector2(0, 70)
+		slot_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+		if slot_index >= items.size():
+			slot_button.text = "Empty slot"
+			slot_button.disabled = true
+		else:
+			slot_button.text = "%s\n%s" % [
+				items[slot_index].item_name, items[slot_index].description
+			]
+			slot_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			slot_button.pressed.connect(
+				_on_item_button_pressed.bind(slot_index)
+			)
+
+			# Items with nothing to act on are red and cannot be clicked.
+			if not usable_flags[slot_index]:
+				slot_button.disabled = true
+				slot_button.modulate = Color(1.0, 0.45, 0.45)
+
+		items_container.add_child(slot_button)
+
+
+func _on_item_button_pressed(slot_index: int) -> void:
+	item_selected.emit(slot_index)

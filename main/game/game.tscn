@@ -24,6 +24,9 @@
 [ext_resource type="Script" path="res://main/shop/pack_resource.gd" id="21_packscript"]
 [ext_resource type="Resource" path="res://main/data/packs/tenant_pack.tres" id="22_tpack"]
 [ext_resource type="Resource" path="res://main/data/packs/action_pack.tres" id="23_apack"]
+[ext_resource type="Script" path="res://main/items/item_resource.gd" id="24_itemscript"]
+[ext_resource type="Resource" path="res://main/data/items/piggy_bank.tres" id="25_piggy"]
+[ext_resource type="Resource" path="res://main/data/items/rent_hike.tres" id="26_hike"]
 
 [node name="Game" type="Node2D" unique_id=1216115917 node_paths=PackedStringArray("building", "hud", "tenant_choice_ui", "shop_ui")]
 script = ExtResource("1_gpuo4")
@@ -37,6 +40,7 @@ shop_tenants = Array[ExtResource("3_tenant")]([ExtResource("4_human"), ExtResour
 shop_actions = Array[ExtResource("9_action")]([ExtResource("10_recruit"), ExtResource("11_random"), ExtResource("13_swap"), ExtResource("14_evict"), ExtResource("15_trade"), ExtResource("16_move")])
 shop_bonuses = Array[ExtResource("18_bonus")]([ExtResource("19_ledger"), ExtResource("20_crypt")])
 shop_packs = Array[ExtResource("21_packscript")]([ExtResource("22_tpack"), ExtResource("23_apack")])
+shop_items = Array[ExtResource("24_itemscript")]([ExtResource("25_piggy"), ExtResource("26_hike")])
 
 [node name="Building" parent="." unique_id=1826555542 instance=ExtResource("1_3ni26")]
 position = Vector2(64, 28)

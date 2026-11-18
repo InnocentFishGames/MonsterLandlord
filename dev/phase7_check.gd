@@ -73,7 +73,7 @@ func _ready() -> void:
 	var action_deck: ActionDeck = ActionDeck.new()
 	action_deck.setup([load("res://main/data/actions/recruit.tres")])
 
-	shop_state.roll_offers(1, 0, 2, 2, run_state.bonuses)
+	shop_state.roll_offers(1, 0, 2, 2, 0, run_state.bonuses)
 	_report(shop_state.offers.size() == 1 + 2 + 2, "offers: 1 tenant + 2 bonuses + 2 packs")
 
 	run_state.add_shop_money(30)
@@ -92,7 +92,7 @@ func _ready() -> void:
 	_report(shop_state.try_buy(bonus_offer, run_state, tenant_bag, action_deck), "buying a bonus works")
 	_report(run_state.bonuses.size() == 1 and run_state.bonuses[0] == bonus_offer.bonus, "bonus joins the run")
 
-	shop_state.roll_offers(1, 0, 2, 0, run_state.bonuses)
+	shop_state.roll_offers(1, 0, 2, 0, 0, run_state.bonuses)
 	var offered_bonuses: int = 0
 	for offer: ShopOffer in shop_state.offers:
 		if offer.kind == ShopOffer.Kind.BONUS:
@@ -101,7 +101,7 @@ func _ready() -> void:
 	_report(offered_bonuses == 1, "only the unowned bonus is offered")
 
 	# Packs
-	shop_state.roll_offers(0, 0, 0, 2, run_state.bonuses)
+	shop_state.roll_offers(0, 0, 0, 2, 0, run_state.bonuses)
 	for offer: ShopOffer in shop_state.offers:
 		if offer.pack.is_tenant_pack():
 			pack_offer = offer
@@ -143,7 +143,7 @@ func _ready() -> void:
 	game.hud.end_round_requested.emit()
 	_report(game.round_state.rent_total == 20, "real round pays tenant + bonus")
 	_report(game.shop_ui.shop_panel.visible, "shop open")
-	_report(game.shop_ui.extra_row.get_child_count() == 3, "shop extra row: the unowned bonus + 2 packs")
+	_report(game.shop_ui.extra_row.get_child_count() == 5, "shop extra row: the unowned bonus + 2 packs + 2 items")
 
 	var real_pack: ShopOffer = null
 	for offer: ShopOffer in game.shop_state.offers:

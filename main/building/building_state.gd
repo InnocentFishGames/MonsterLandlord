@@ -215,3 +215,16 @@ func move_tenant(from_position: Vector2i, to_position: Vector2i) -> bool:
 	tenant_changed.emit(to_position, tenant_instance)
 
 	return true
+
+
+func add_base_rent(grid_position: Vector2i, amount: int) -> bool:
+	# Gives the tenant on this cell extra base rent (see TenantInstance).
+	var tenant_instance: TenantInstance = get_tenant_at(grid_position)
+
+	if tenant_instance == null:
+		return false
+
+	tenant_instance.base_rent_bonus += amount
+	tenant_changed.emit(grid_position, tenant_instance)
+
+	return true

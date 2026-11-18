@@ -9,7 +9,8 @@ enum Kind {
 	TENANT,
 	ACTION,
 	BONUS,
-	PACK
+	PACK,
+	ITEM
 }
 
 var kind: Kind
@@ -17,6 +18,7 @@ var tenant_resource: TenantResource = null
 var action_resource: ActionResource = null
 var bonus: PersistentBonus = null
 var pack: PackResource = null
+var item: ItemResource = null
 var price: int = 0
 var is_sold: bool = false
 
@@ -45,6 +47,12 @@ static func for_pack(new_pack: PackResource, new_price: int) -> ShopOffer:
 	return offer
 
 
+static func for_item(new_item: ItemResource, new_price: int) -> ShopOffer:
+	var offer: ShopOffer = ShopOffer.new(Kind.ITEM, new_price)
+	offer.item = new_item
+	return offer
+
+
 func _init(new_kind: Kind, new_price: int) -> void:
 	kind = new_kind
 	price = new_price
@@ -58,6 +66,8 @@ func get_title() -> String:
 			return action_resource.action_name
 		Kind.BONUS:
 			return bonus.bonus_name
+		Kind.ITEM:
+			return item.item_name
 		_:
 			return pack.pack_name
 
@@ -70,5 +80,7 @@ func get_text() -> String:
 			return action_resource.description
 		Kind.BONUS:
 			return bonus.description
+		Kind.ITEM:
+			return item.description
 		_:
 			return pack.description

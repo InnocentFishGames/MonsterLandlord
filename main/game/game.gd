@@ -29,10 +29,12 @@ extends Node2D
 @export var shop_actions: Array[ActionResource] = []
 @export var shop_bonuses: Array[PersistentBonus] = []
 @export var shop_packs: Array[PackResource] = []
+@export var shop_items: Array[ItemResource] = []
 @export var shop_tenant_offers: int = 3
 @export var shop_action_offers: int = 3
 @export var shop_bonus_offers: int = 1
 @export var shop_pack_offers: int = 2
+@export var shop_item_offers: int = 2
 
 # Runtime state for the run. Game creates these and passes amounts to the
 # interface; the interface never touches them directly.
@@ -101,7 +103,9 @@ func _ready() -> void:
 	if not shop_ui.initialize():
 		return
 
-	if not shop_state.setup(shop_tenants, shop_actions, shop_bonuses, shop_packs):
+	if not shop_state.setup(
+		shop_tenants, shop_actions, shop_bonuses, shop_packs, shop_items
+	):
 		return
 
 	if not _setup_run():
@@ -111,6 +115,7 @@ func _ready() -> void:
 	hud.action_card_selected.connect(_on_action_card_selected)
 	hud.end_round_requested.connect(_on_end_round_requested)
 	hud.restart_requested.connect(_on_restart_requested)
+	hud.item_selected.connect(_on_item_selected)
 
 	shop_ui.offer_selected.connect(_on_shop_offer_selected)
 	shop_ui.pack_choice_selected.connect(_on_pack_choice_selected)
@@ -176,6 +181,12 @@ func _refresh_hud() -> void:
 
 	hud.set_hand(action_deck.hand, round_state.plays_remaining, playable_flags)
 
+	var item_flags: Array[bool] = []
+
+	for held_item: ItemResource in run_state.items:
+		item_flags.append(held_item.can_use(check_context))
+
+	hud.set_items(run_state.items, RunState.ITEM_SLOT_COUNT, item_flags)
 	hud.set_bonuses(run_state.bonuses)
 	hud.set_run_info(
 		run_state.current_round,
@@ -216,7 +227,10 @@ func _on_action_card_selected(action_resource: ActionResource) -> void:
 
 	# The whole card, including anything that waits for the player, must
 	# finish before the card is discarded.
-	await _resolve_action(action_resource)
+	await _resolve_effects(
+		action_resource.effects,
+		[GameEvent.new(GameEvent.Trigger.ACTION_PLAYED)]
+	)
 
 	is_resolving = false
 	hud.set_locked(false)
@@ -241,10 +255,14 @@ func _on_action_card_selected(action_resource: ActionResource) -> void:
 	_refresh_hud()
 
 
-func _resolve_action(action_resource: ActionResource) -> void:
+func _resolve_effects(
+	effects: Array[ActionEffect],
+	starting_events: Array[GameEvent]
+) -> void:
 	var context: ActionContext = ActionContext.new(
 		tenant_bag,
-		building.building_state
+		building.building_state,
+		run_state
 	)
 
 	# When an effect needs the player, show the matching interface.
@@ -253,7 +271,7 @@ func _resolve_action(action_resource: ActionResource) -> void:
 
 	_active_context = context
 
-	for action_effect: ActionEffect in action_resource.effects:
+	for action_effect: ActionEffect in effects:
 		# Some effects wait for the player and some finish at once. The
 		# base class cannot say which, so the "unneeded await" warning is
 		# expected here.
@@ -262,13 +280,40 @@ func _resolve_action(action_resource: ActionResource) -> void:
 
 	_active_context = null
 
-	# The card is done and every placement stands on the board. Now tenants
-	# react, as one chain, in top-left to bottom-right order.
-	var chain_events: Array[GameEvent] = [
-		GameEvent.new(GameEvent.Trigger.ACTION_PLAYED)
-	]
+	# The effects are done and every change stands on the board. Now tenants
+	# react, as one chain, in top-left to bottom-right order. A card starts
+	# its chain with ACTION_PLAYED; an item has no starting event.
+	var chain_events: Array[GameEvent] = starting_events.duplicate()
 	chain_events.append_array(context.events)
 	_resolve_chain(chain_events)
+
+
+func _on_item_selected(slot_index: int) -> void:
+	# Items can be used between cards while a round is running. Stale clicks
+	# (a card resolving, the round over, an empty slot) are ignored.
+	if is_resolving or not round_state.is_active:
+		return
+
+	if slot_index < 0 or slot_index >= run_state.items.size():
+		return
+
+	var item: ItemResource = run_state.items[slot_index]
+
+	# An item with nothing to act on is shown in red and cannot be used.
+	if not item.can_use(_make_check_context()):
+		return
+
+	# The item is spent as soon as it is used, like a card's play cost.
+	run_state.remove_item(slot_index)
+
+	is_resolving = true
+	hud.set_locked(true)
+
+	await _resolve_effects(item.effects, [])
+
+	is_resolving = false
+	hud.set_locked(false)
+	_refresh_hud()
 
 
 func _on_tenant_choice_requested(
@@ -344,9 +389,14 @@ func _on_round_ended() -> void:
 		shop_action_offers,
 		shop_bonus_offers,
 		shop_pack_offers,
+		shop_item_offers,
 		run_state.bonuses
 	)
-	shop_ui.show_shop(shop_state.offers, run_state.shop_money)
+	shop_ui.show_shop(
+		shop_state.offers,
+		run_state.shop_money,
+		not run_state.has_free_item_slot()
+	)
 
 
 func _on_shop_offer_selected(offer: ShopOffer) -> void:
@@ -360,12 +410,20 @@ func _on_shop_offer_selected(offer: ShopOffer) -> void:
 		# shop continues.
 		shop_ui.show_pack_choices(shop_state.roll_pack_choices(offer))
 	else:
-		shop_ui.refresh(shop_state.offers, run_state.shop_money)
+		shop_ui.refresh(
+			shop_state.offers,
+			run_state.shop_money,
+			not run_state.has_free_item_slot()
+		)
 
 
 func _on_pack_choice_selected(choice: ShopOffer) -> void:
 	shop_state.take_pack_choice(choice, tenant_bag, action_deck)
-	shop_ui.refresh(shop_state.offers, run_state.shop_money)
+	shop_ui.refresh(
+		shop_state.offers,
+		run_state.shop_money,
+		not run_state.has_free_item_slot()
+	)
 	_refresh_hud()
 
 
@@ -418,7 +476,7 @@ func _on_board_changed(
 
 func _make_check_context() -> ActionContext:
 	# A throwaway context used only to ask "could this card do anything?".
-	return ActionContext.new(tenant_bag, building.building_state)
+	return ActionContext.new(tenant_bag, building.building_state, run_state)
 
 
 func _has_playable_card() -> bool:

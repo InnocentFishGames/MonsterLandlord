@@ -26,6 +26,8 @@ signal _cell_choice_submitted(grid_position: Vector2i)
 
 var tenant_bag: TenantBag
 var building_state: BuildingState
+# Items and some cards change the run itself, such as shop money.
+var run_state: RunState
 
 # Everything that happened during this card, in order. Game hands these to
 # the ChainResolver once the card is done.
@@ -39,10 +41,12 @@ var _pending_valid_positions: Array[Vector2i] = []
 
 func _init(
 	new_tenant_bag: TenantBag,
-	new_building_state: BuildingState
+	new_building_state: BuildingState,
+	new_run_state: RunState
 ) -> void:
 	tenant_bag = new_tenant_bag
 	building_state = new_building_state
+	run_state = new_run_state
 
 
 func draw_tenants(count: int) -> Array[TenantInstance]:
@@ -225,3 +229,8 @@ func send_tenant_back_to_bag(grid_position: Vector2i) -> bool:
 func move_tenant(from_position: Vector2i, to_position: Vector2i) -> bool:
 	# Moving is not one of the trigger events, so it records nothing.
 	return building_state.move_tenant(from_position, to_position)
+
+
+func add_base_rent(grid_position: Vector2i, amount: int) -> bool:
+	# Not one of the trigger events, so it records nothing.
+	return building_state.add_base_rent(grid_position, amount)

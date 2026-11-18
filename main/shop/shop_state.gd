@@ -9,6 +9,7 @@ var tenant_pool: Array[TenantResource] = []
 var action_pool: Array[ActionResource] = []
 var bonus_pool: Array[PersistentBonus] = []
 var pack_pool: Array[PackResource] = []
+var item_pool: Array[ItemResource] = []
 var offers: Array[ShopOffer] = []
 
 
@@ -16,11 +17,13 @@ func setup(
 	new_tenant_pool: Array[TenantResource],
 	new_action_pool: Array[ActionResource],
 	new_bonus_pool: Array[PersistentBonus] = [],
-	new_pack_pool: Array[PackResource] = []
+	new_pack_pool: Array[PackResource] = [],
+	new_item_pool: Array[ItemResource] = []
 ) -> bool:
 	if (
 		new_tenant_pool.is_empty() and new_action_pool.is_empty()
 		and new_bonus_pool.is_empty() and new_pack_pool.is_empty()
+		and new_item_pool.is_empty()
 	):
 		push_error(
 			"ShopState: All pools are empty. Assign tenants, actions, bonuses or packs the shop can sell."
@@ -51,6 +54,7 @@ func setup(
 	action_pool = new_action_pool.duplicate()
 	bonus_pool = new_bonus_pool.duplicate()
 	pack_pool = new_pack_pool.duplicate()
+	item_pool = new_item_pool.duplicate()
 
 	return true
 
@@ -60,6 +64,7 @@ func roll_offers(
 	action_count: int,
 	bonus_count: int,
 	pack_count: int,
+	item_count: int,
 	owned_bonuses: Array[PersistentBonus]
 ) -> void:
 	# Random picks without repeats within one visit. A small pool simply
@@ -103,6 +108,14 @@ func roll_offers(
 			shuffled_packs[index], shuffled_packs[index].shop_price
 		))
 
+	var shuffled_items: Array[ItemResource] = item_pool.duplicate()
+	shuffled_items.shuffle()
+
+	for index: int in range(mini(item_count, shuffled_items.size())):
+		offers.append(ShopOffer.for_item(
+			shuffled_items[index], shuffled_items[index].shop_price
+		))
+
 
 func try_buy(
 	offer: ShopOffer,
@@ -112,6 +125,10 @@ func try_buy(
 ) -> bool:
 	# Sold items and unaffordable items are normal rejections.
 	if offer.is_sold or not offers.has(offer):
+		return false
+
+	# A full inventory rejects the purchase before any money is spent.
+	if offer.kind == ShopOffer.Kind.ITEM and not run_state.has_free_item_slot():
 		return false
 
 	if not run_state.try_spend_shop_money(offer.price):
@@ -124,6 +141,8 @@ func try_buy(
 			action_deck.add_card(offer.action_resource)
 		ShopOffer.Kind.BONUS:
 			run_state.add_bonus(offer.bonus)
+		ShopOffer.Kind.ITEM:
+			run_state.add_item(offer.item)
 		ShopOffer.Kind.PACK:
 			# Paying opens the pack; the player picks the item afterwards
 			# (see roll_pack_choices and take_pack_choice).

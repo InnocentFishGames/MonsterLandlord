@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d1xew1gxltpon" path="res://main/ui/hud/hud.gd" id="1_pl8eb"]
 
-[node name="Hud" type="CanvasLayer" unique_id=1913822774 node_paths=PackedStringArray("run_label", "bonuses_label", "plays_label", "rent_label", "projected_rent_label", "rent_log_label", "pile_counts_label", "prompt_label", "hand_container", "end_round_button", "restart_button")]
+[node name="Hud" type="CanvasLayer" unique_id=1913822774 node_paths=PackedStringArray("run_label", "bonuses_label", "plays_label", "rent_label", "projected_rent_label", "rent_log_label", "pile_counts_label", "prompt_label", "items_container", "hand_container", "end_round_button", "restart_button")]
 script = ExtResource("1_pl8eb")
 run_label = NodePath("SidePanel/RunLabel")
 bonuses_label = NodePath("SidePanel/BonusesLabel")
@@ -12,6 +12,7 @@ projected_rent_label = NodePath("SidePanel/ProjectedRentLabel")
 rent_log_label = NodePath("SidePanel/RentLogLabel")
 pile_counts_label = NodePath("SidePanel/PileCountsLabel")
 prompt_label = NodePath("SidePanel/PromptLabel")
+items_container = NodePath("SidePanel/ItemsContainer")
 hand_container = NodePath("SidePanel/HandContainer")
 end_round_button = NodePath("SidePanel/EndRoundButton")
 restart_button = NodePath("SidePanel/RestartButton")
@@ -57,6 +58,9 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
 autowrap_mode = 3
+
+[node name="ItemsContainer" type="HBoxContainer" parent="SidePanel"]
+layout_mode = 2
 
 [node name="HandContainer" type="VBoxContainer" parent="SidePanel"]
 layout_mode = 2

@@ -35,7 +35,7 @@ func _ready() -> void:
 	var swap: ActionResource = load("res://main/data/actions/swap.tres")
 	var shop_state: ShopState = ShopState.new()
 	_report(shop_state.setup([human, vampire], [recruit, swap]), "shop setup succeeds")
-	shop_state.roll_offers(5, 1, 0, 0, [])
+	shop_state.roll_offers(5, 1, 0, 0, 0, [])
 	_report(shop_state.offers.size() == 3, "offers capped by pool size (2 tenants + 1 action)")
 
 	var tenant_bag: TenantBag = TenantBag.new()

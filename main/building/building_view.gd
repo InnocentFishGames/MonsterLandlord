@@ -139,9 +139,20 @@ func _draw() -> void:
 		draw_string(
 			font,
 			cell_origin + Vector2(0.0, cell_size.y * 0.5 + 85.0),
-			tenant_instance.tenant_resource.tenant_name,
+			_get_label_text(tenant_instance),
 			HORIZONTAL_ALIGNMENT_CENTER,
 			cell_size.x,
 			26,
 			Color.WHITE
 		)
+
+
+func _get_label_text(tenant_instance: TenantInstance) -> String:
+	# Shows the extra base rent an item gave this tenant, e.g. "Human (+$10)".
+	if tenant_instance.base_rent_bonus == 0:
+		return tenant_instance.tenant_resource.tenant_name
+
+	return "%s (+$%d)" % [
+		tenant_instance.tenant_resource.tenant_name,
+		tenant_instance.base_rent_bonus
+	]

@@ -19,7 +19,7 @@ func _make_context(tenant_count: int) -> ActionContext:
 	var state: BuildingState = BuildingState.new()
 	state.setup(4, 4)
 
-	return ActionContext.new(bag, state)
+	return ActionContext.new(bag, state, RunState.new())
 
 
 func _fill_cells(context: ActionContext, cell_count: int) -> void:

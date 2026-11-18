@@ -7,6 +7,9 @@ extends RefCounted
 var tenant_resource: TenantResource
 # What this tenant really is. Never changes.
 var base_resource: TenantResource
+# Extra base rent given by items. Lasts for the rest of the run, even
+# when the tenant goes back to the bag. Base-rent abilities add it.
+var base_rent_bonus: int = 0
 
 
 func _init(new_tenant_resource: TenantResource) -> void:
